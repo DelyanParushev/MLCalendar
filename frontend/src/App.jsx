@@ -28,10 +28,43 @@ function CalendarApp() {
       
       console.log(`Current system time: ${currentHour}:${currentMinute.toString().padStart(2, '0')}`);
       
+      // Debug: List ALL FullCalendar elements to understand the structure
+      console.log('=== DEBUGGING CALENDAR STRUCTURE ===');
+      const allFcElements = document.querySelectorAll('[class*="fc-"]');
+      console.log(`Found ${allFcElements.length} FullCalendar elements total`);
+      
+      // Get unique class names to understand what's available
+      const uniqueClasses = new Set();
+      allFcElements.forEach(el => {
+        el.classList.forEach(cls => {
+          if (cls.includes('fc-')) uniqueClasses.add(cls);
+        });
+      });
+      console.log('Available FullCalendar classes:', Array.from(uniqueClasses).sort());
+      
       // Check what view we're in using multiple methods
       const calendarView = document.querySelector('.fc-view');
       const viewClasses = calendarView ? calendarView.className : '';
       console.log(`Calendar view classes: "${viewClasses}"`);
+      
+      // Check for current view type specifically
+      const currentViewElement = document.querySelector('.fc-view');
+      if (currentViewElement) {
+        const classList = Array.from(currentViewElement.classList);
+        console.log('Current view element classes:', classList);
+        
+        const isMonthView = classList.some(cls => cls.includes('month') || cls.includes('dayGrid'));
+        const isWeekView = classList.some(cls => cls.includes('week') || cls.includes('timeGrid'));
+        const isDayView = classList.some(cls => cls.includes('day') && cls.includes('timeGrid'));
+        
+        console.log(`View type detection: Month=${isMonthView}, Week=${isWeekView}, Day=${isDayView}`);
+        
+        if (isMonthView) {
+          console.log('🗓️ You are in MONTH view - time indicator only works in WEEK or DAY view');
+          console.log('👆 Please click "Week" or "Day" button in the calendar toolbar to see the time indicator');
+          return;
+        }
+      }
       
       // Also check for specific view type elements
       const hasTimeGrid = document.querySelector('.fc-timegrid-view') || 
@@ -48,11 +81,16 @@ function CalendarApp() {
       
       // Only proceed if we can find time grid elements (more reliable than class checking)
       if (!hasTimeGrid && !hasTimeSlots) {
-        console.log('Not in a time grid view - no time grid elements found');
+        console.log('❌ Not in a time grid view - no time grid elements found');
+        console.log('💡 To see the current time indicator:');
+        console.log('   1. Look for buttons like "Month", "Week", "Day" at the top of the calendar');
+        console.log('   2. Click on "Week" or "Day" button');
+        console.log('   3. The red time indicator line will appear');
         return;
       }
       
-      console.log('Time grid view detected - proceeding with indicator');
+      console.log('✅ Time grid view detected - proceeding with indicator');
+      console.log('=== END DEBUG INFO ===');
       
       // Wait a bit for FullCalendar to fully render time grid elements
       setTimeout(() => {
@@ -102,8 +140,20 @@ function CalendarApp() {
             let firstTimeLabelText = '00:00';
             
             if (timeLabels.length > 0) {
-              firstTimeLabelText = timeLabels[0].textContent.trim();
-              console.log(`First time label text: "${firstTimeLabelText}"`);
+              // Filter out "all-day" labels and find the first actual time
+              const actualTimeLabels = Array.from(timeLabels).filter(label => {
+                const text = label.textContent.trim();
+                return text.includes(':') || text.match(/\d+(AM|PM)/);
+              });
+              
+              if (actualTimeLabels.length > 0) {
+                firstTimeLabelText = actualTimeLabels[0].textContent.trim();
+              } else if (timeLabels.length > 1) {
+                // If no time format found, try the second label (skip all-day)
+                firstTimeLabelText = timeLabels[1].textContent.trim();
+              }
+              
+              console.log(`First actual time label text: "${firstTimeLabelText}"`);
               
               // Try to parse the time - handle different formats
               if (firstTimeLabelText.includes(':')) {
@@ -120,6 +170,10 @@ function CalendarApp() {
                     startHour = 0;
                   }
                 }
+              } else if (firstTimeLabelText === 'all-day') {
+                // Default to 6 AM if we still got all-day
+                startHour = 6;
+                console.log('Using default start hour of 6 AM since only all-day label found');
               }
             }
             
@@ -137,7 +191,7 @@ function CalendarApp() {
               indicator.className = 'custom-time-indicator';
               indicator.style.top = `${Math.max(0, topPosition)}px`;
               body.appendChild(indicator);
-              console.log(`Body ${bodyIndex}: Indicator added at position: ${Math.max(0, topPosition)}px`);
+              console.log(`Body ${bodyIndex}: ✅ Indicator added at position: ${Math.max(0, topPosition)}px`);
             } else {
               console.log(`Body ${bodyIndex}: Current time is outside visible range (hours from start: ${hoursFromStart.toFixed(2)})`);
             }

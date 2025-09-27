@@ -5,14 +5,21 @@ from datetime import datetime, timedelta, time, date
 from typing import Optional, Tuple
 import os
 
+# Disable ML loading for deployment to save memory
+ENABLE_ML_MODEL = os.getenv("ENABLE_ML_MODEL", "false").lower() == "true"
+
 # Import ML libraries with fallback
-try:
-    import torch
-    from transformers import BertTokenizerFast, BertForTokenClassification
-    ML_AVAILABLE = True
-    print("🤖 ML libraries loaded successfully")
-except ImportError as e:
-    print(f"⚠️ ML libraries not available: {e}")
+if ENABLE_ML_MODEL:
+    try:
+        import torch
+        from transformers import BertTokenizerFast, BertForTokenClassification
+        ML_AVAILABLE = True
+        print("🤖 ML libraries loaded successfully")
+    except ImportError as e:
+        print(f"⚠️ ML libraries not available: {e}")
+        ML_AVAILABLE = False
+else:
+    print("🚫 ML model loading disabled to save memory")
     ML_AVAILABLE = False
 
 # Load model from Hugging Face Hub
@@ -23,7 +30,7 @@ tokenizer = None
 model = None
 LABELS = ["O", "B-TITLE", "I-TITLE", "B-TIME", "I-TIME", "B-DATE", "I-DATE", "B-DURATION", "I-DURATION"]
 
-if ML_AVAILABLE:
+if ENABLE_ML_MODEL and ML_AVAILABLE:
     try:
         print(f"📥 Loading model from Hugging Face: {MODEL_NAME}")
         # Try to load the model from Hugging Face
@@ -33,20 +40,7 @@ if ML_AVAILABLE:
         print(f"✅ Successfully loaded model from Hugging Face: {MODEL_NAME}")
     except Exception as e:
         print(f"❌ Failed to load model from Hugging Face: {e}")
-        # Fallback to local model if available
-        try:
-            MODEL_DIR = "ml/model"
-            if os.path.exists(MODEL_DIR):
-                tokenizer = BertTokenizerFast.from_pretrained(MODEL_DIR)
-                model = BertForTokenClassification.from_pretrained(MODEL_DIR)
-                model.eval()
-                print(f"✅ Successfully loaded local model from: {MODEL_DIR}")
-            else:
-                print(f"⚠️ Local model directory not found: {MODEL_DIR}")
-                ML_AVAILABLE = False
-        except Exception as local_e:
-            print(f"❌ Failed to load local model: {local_e}")
-            ML_AVAILABLE = False
+        ML_AVAILABLE = False
 
 print(f"🤖 ML Model available: {ML_AVAILABLE}")
 
@@ -377,7 +371,7 @@ def parse_text(text: str) -> dict:
         "end_datetime": end_dt,
         "tokens": tokens,
         "labels": labels,
-        "debug": {"model_dir": MODEL_DIR, "note": "inference ok"}
+        "debug": {"note": "inference ok", "ml_enabled": ENABLE_ML_MODEL}
     }
 
 if __name__ == "__main__":
@@ -408,7 +402,10 @@ if __name__ == "__main__":
         print("-" * 80)
 
     print("\nИнформация за модела:")
-    print("Зареден от:", MODEL_DIR)
-    print("Размер на речника:", tokenizer.vocab_size)
-    print("Брой етикети:", model.config.num_labels)
-    print("Налични етикети:", LABELS)
+    if ML_AVAILABLE and tokenizer and model:
+        print("Зареден от: Hugging Face Hub")
+        print("Размер на речника:", tokenizer.vocab_size)
+        print("Брой етикети:", model.config.num_labels)
+        print("Налични етикети:", LABELS)
+    else:
+        print("ML модел не е зареден - използва се fallback парсер")

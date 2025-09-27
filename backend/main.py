@@ -15,17 +15,17 @@ load_dotenv()
 app = FastAPI(title="AI Calendar API", version="0.2.0")
 
 # CORS configuration from environment
-cors_origins = os.getenv("CORS_ORIGINS", "*")
+cors_origins = os.getenv("CORS_ORIGINS", "https://ml-calendar.vercel.app,http://localhost:5173")
 if cors_origins == "*":
-    cors_origins = ["*"]
+    cors_origins_list = ["*"]
 else:
-    cors_origins = [origin.strip() for origin in cors_origins.split(",")]
+    cors_origins_list = [origin.strip() for origin in cors_origins.split(",")]
 
-print(f"🌐 CORS Origins: {cors_origins}")
+print(f"🌐 CORS Origins: {cors_origins_list}")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=cors_origins,
+    allow_origins=cors_origins_list,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
@@ -77,6 +77,25 @@ def get_db():
         yield db
     finally:
         db.close()
+
+# Health check endpoint
+@app.get("/")
+def health_check():
+    return {
+        "status": "healthy",
+        "message": "AI Calendar API is running!",
+        "version": "0.2.0",
+        "cors_origins": os.getenv("CORS_ORIGINS", "not-set")
+    }
+
+@app.get("/health")
+def health_check_detailed():
+    return {
+        "status": "healthy",
+        "database": "connected",
+        "cors_origins": os.getenv("CORS_ORIGINS", "not-set"),
+        "ml_model": os.getenv("ENABLE_ML_MODEL", "false")
+    }
 
 # Authentication endpoints
 @app.post("/register", response_model=schemas.UserOut)

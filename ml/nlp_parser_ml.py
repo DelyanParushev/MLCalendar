@@ -4,12 +4,20 @@ import json
 from datetime import datetime, timedelta, time, date
 from typing import Optional, Tuple
 import os
+import requests
 
-# Disable ML loading for deployment to save memory
+# Configuration for ML model loading
 ENABLE_ML_MODEL = os.getenv("ENABLE_ML_MODEL", "true").lower() == "true"
+USE_HF_SPACE = os.getenv("USE_HF_SPACE", "true").lower() == "true"
+HF_SPACE_URL = os.getenv("HF_SPACE_URL", "https://dex7er999-calendar-nlp-api.hf.space")
 
-# Import ML libraries with fallback
-if ENABLE_ML_MODEL:
+print(f"🤖 ML Model enabled: {ENABLE_ML_MODEL}")
+print(f"🚀 Using HF Space: {USE_HF_SPACE}")
+if USE_HF_SPACE:
+    print(f"🌐 HF Space URL: {HF_SPACE_URL}")
+
+# Import ML libraries only if not using HF Space
+if ENABLE_ML_MODEL and not USE_HF_SPACE:
     try:
         import torch
         from transformers import BertTokenizerFast, BertForTokenClassification
@@ -19,8 +27,12 @@ if ENABLE_ML_MODEL:
         print(f"⚠️ ML libraries not available: {e}")
         ML_AVAILABLE = False
 else:
-    print("🚫 ML model loading disabled to save memory")
-    ML_AVAILABLE = False
+    if USE_HF_SPACE:
+        print("🚀 Using Hugging Face Space for ML inference")
+        ML_AVAILABLE = True
+    else:
+        print("🚫 ML model loading disabled")
+        ML_AVAILABLE = False
 
 # Load model from Hugging Face Hub
 MODEL_NAME = "dex7er999/NLPCalendar"
@@ -208,21 +220,81 @@ def _find_daytime_hint(tokens: list[str], labels: list[str]) -> Optional[time]:
                 return DAYTIME_HINTS[tok.lower()]
     return None
 
+def query_hf_space(text: str) -> dict:
+    """Query the Hugging Face Space API for ML inference"""
+    try:
+        # Make API call to your HF Space
+        response = requests.post(
+            f"{HF_SPACE_URL}/api/parse",
+            json={"text": text},
+            timeout=30
+        )
+        response.raise_for_status()
+        result = response.json()
+        
+        print(f"✅ HF Space API call successful")
+        return result
+        
+    except requests.exceptions.RequestException as e:
+        print(f"❌ HF Space API error: {e}")
+        return None
+    except Exception as e:
+        print(f"❌ Unexpected error calling HF Space: {e}")
+        return None
+
 def parse_text(text: str) -> dict:
     if not text or not text.strip():
         return {"title": "", "datetime": None, "tokens": [], "labels": [], "debug": {"note": "empty text"}}
     
-    # If ML is not available, return a simple fallback
-    if not ML_AVAILABLE or model is None or tokenizer is None:
-        print("⚠️ ML model not available, using simple fallback parsing")
-        words = text.split()
-        
-        # Simple fallback - try to extract basic info
-        now = datetime.now()
-        
-        # Look for common time patterns
-        time_pattern = r'\b(\d{1,2})[:\.](\d{2})\b|\b(\d{1,2})\s*часа?\b'
-        time_matches = re.findall(time_pattern, text.lower())
+    # Try HF Space API first if enabled
+    if USE_HF_SPACE and ML_AVAILABLE:
+        print("🚀 Using Hugging Face Space for parsing")
+        hf_result = query_hf_space(text)
+        if hf_result:
+            return hf_result
+        else:
+            print("⚠️ HF Space failed, falling back to local processing")
+    
+    # Local ML model processing (if available)
+    if not USE_HF_SPACE and ML_AVAILABLE and model is not None and tokenizer is not None:
+        return parse_with_local_model(text)
+    
+    # Fallback parsing
+    print("⚠️ Using simple fallback parsing")
+    return parse_fallback(text)
+
+def parse_fallback(text: str) -> dict:
+    """Simple fallback parsing when ML model is not available"""
+    words = text.split()
+    now = datetime.now()
+    
+    # Look for common time patterns
+    time_pattern = r'\b(\d{1,2})[:\.](\d{2})\b|\b(\d{1,2})\s*часа?\b'
+    time_matches = re.findall(time_pattern, text.lower())
+    
+    start_dt = None
+    if time_matches:
+        for match in time_matches:
+            hour = int(match[0] or match[2])
+            minute = int(match[1]) if match[1] else 0
+            if 0 <= hour <= 23 and 0 <= minute <= 59:
+                start_dt = datetime.combine(now.date(), time(hour, minute))
+                if start_dt < now:
+                    start_dt += timedelta(days=1)
+                break
+    
+    return {
+        "title": text.strip(),
+        "datetime": start_dt,
+        "start": start_dt,
+        "end_datetime": None,
+        "tokens": words,
+        "labels": ["O"] * len(words),
+        "debug": {"note": "fallback parsing - ML model not available"}
+    }
+
+def parse_with_local_model(text: str) -> dict:
+    """Parse text using locally loaded ML model"""
         
         start_dt = None
         if time_matches:

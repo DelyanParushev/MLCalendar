@@ -15,7 +15,7 @@ load_dotenv()
 app = FastAPI(title="AI Calendar API", version="0.2.0")
 
 # CORS configuration from environment
-cors_origins = os.getenv("CORS_ORIGINS", "https://ml-calendar.vercel.app,http://localhost:5173")
+cors_origins = os.getenv("CORS_ORIGINS", "https://ml-calendar.vercel.app,http://localhost:5173,http://localhost:3000")
 if cors_origins == "*":
     cors_origins_list = ["*"]
 else:
@@ -36,6 +36,10 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     try:
+        print("🚀 Starting application...")
+        print(f"🌐 Environment: {os.getenv('RAILWAY_ENVIRONMENT_NAME', 'local')}")
+        print(f"🌐 CORS Origins: {cors_origins_list}")
+        
         # Create all tables
         Base.metadata.create_all(bind=engine)
         
@@ -150,44 +154,62 @@ def read_users_me(current_user: models.User = Depends(auth.get_current_active_us
 # Event parsing endpoint (no auth required for parsing)
 @app.post("/parse")
 def parse_event(payload: dict):
-    text = payload.get("text", "")
-    if not text:
-        return {"error": "Не е подаден текст."}
+    try:
+        text = payload.get("text", "")
+        if not text:
+            return {"error": "Не е подаден текст."}
 
-    result = parse_text(text)
-    dt = result.get("datetime") or result.get("start")  # Backwards compatibility
-    if dt is None:
-        return {
-            "error": "Не можах да разбера датата/часа.",
-            "debug": {
-                "tokens": result.get("tokens", []),
-                "labels": result.get("labels", []),
-                **(result.get("debug") or {})
-            }
-        }
-
-    # Convert string datetime to datetime object if needed
-    if isinstance(dt, str):
-        try:
-            dt = datetime.fromisoformat(dt.replace('Z', '+00:00'))
-        except ValueError:
+        print(f"🔍 Parsing request: '{text}'")
+        result = parse_text(text)
+        print(f"🔍 Parse result: {result}")
+        
+        dt = result.get("datetime") or result.get("start")  # Backwards compatibility
+        if dt is None:
             return {
-                "error": "Невалиден формат на датата.",
-                "debug": {"raw_datetime": dt}
+                "error": "Не можах да разбера датата/часа.",
+                "debug": {
+                    "tokens": result.get("tokens", []),
+                    "labels": result.get("labels", []),
+                    **(result.get("debug") or {})
+                }
             }
 
-    end = result.get("end_datetime") or result.get("end")  # Get the end time from parse_text
+        # Convert string datetime to datetime object if needed
+        if isinstance(dt, str):
+            try:
+                dt = datetime.fromisoformat(dt.replace('Z', '+00:00'))
+                print(f"🔍 Converted datetime: {dt}")
+            except ValueError as e:
+                print(f"❌ DateTime conversion error: {e}")
+                return {
+                    "error": "Невалиден формат на датата.",
+                    "debug": {"raw_datetime": dt, "conversion_error": str(e)}
+                }
+
+        end = result.get("end_datetime") or result.get("end")  # Get the end time from parse_text
+        
+        # Convert string end datetime to datetime object if needed
+        if isinstance(end, str):
+            try:
+                end = datetime.fromisoformat(end.replace('Z', '+00:00'))
+                print(f"🔍 Converted end datetime: {end}")
+            except ValueError:
+                print("⚠️ Could not convert end datetime, will calculate from start")
+                end = None
+        
+        # If no end time is specified, set it to start time + 1 hour
+        if not end and dt:
+            end = dt + timedelta(hours=1)
+            print(f"🔍 Calculated end time: {end}")
     
-    # Convert string end datetime to datetime object if needed
-    if isinstance(end, str):
-        try:
-            end = datetime.fromisoformat(end.replace('Z', '+00:00'))
-        except ValueError:
-            end = None
-    
-    # If no end time is specified, set it to start time + 1 hour
-    if not end and dt:
-        end = dt + timedelta(hours=1)
+    except Exception as e:
+        print(f"❌ Parse endpoint error: {e}")
+        import traceback
+        traceback.print_exc()
+        return {
+            "error": "Вътрешна грешка при парсиране.",
+            "debug": {"exception": str(e)}
+        }
         
     return {
         "title": result.get("title", ""),

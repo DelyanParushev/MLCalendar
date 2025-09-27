@@ -42,7 +42,8 @@ tokenizer = None
 model = None
 LABELS = ["O", "B-TITLE", "I-TITLE", "B-TIME", "I-TIME", "B-DATE", "I-DATE", "B-DURATION", "I-DURATION"]
 
-if ENABLE_ML_MODEL and ML_AVAILABLE:
+# Only try to load local model if not using HF Space and ML is enabled
+if ENABLE_ML_MODEL and not USE_HF_SPACE and ML_AVAILABLE:
     try:
         print(f"📥 Loading model from Hugging Face: {MODEL_NAME}")
         # Try to load the model from Hugging Face
@@ -53,6 +54,12 @@ if ENABLE_ML_MODEL and ML_AVAILABLE:
     except Exception as e:
         print(f"❌ Failed to load model from Hugging Face: {e}")
         ML_AVAILABLE = False
+elif USE_HF_SPACE:
+    print("🚀 Using HF Space - skipping local model loading")
+elif not ENABLE_ML_MODEL:
+    print("🚫 ML model loading disabled")
+else:
+    print("⚠️ ML libraries not available")
 
 print(f"🤖 ML Model available: {ML_AVAILABLE}")
 
@@ -227,13 +234,31 @@ def query_hf_space(text: str) -> dict:
         response = requests.post(
             f"{HF_SPACE_URL}/api/parse",
             json={"text": text},
-            timeout=30
+            timeout=30,
+            headers={"Content-Type": "application/json"}
         )
         response.raise_for_status()
         result = response.json()
         
-        print(f"✅ HF Space API call successful")
-        return result
+        print(f"✅ HF Space API call successful for text: '{text}'")
+        
+        # Check if there's an error in the response
+        if "error" in result:
+            print(f"⚠️ HF Space returned error: {result['error']}")
+            return None
+            
+        # Ensure the response has the expected structure
+        if "title" in result and ("start" in result or "datetime" in result):
+            # Add backward compatibility field
+            if "start" in result and "datetime" not in result:
+                result["datetime"] = result["start"]
+            elif "datetime" in result and "start" not in result:
+                result["start"] = result["datetime"]
+                
+            return result
+        else:
+            print(f"⚠️ HF Space response missing required fields: {result}")
+            return None
         
     except requests.exceptions.RequestException as e:
         print(f"❌ HF Space API error: {e}")
@@ -295,27 +320,11 @@ def parse_fallback(text: str) -> dict:
 
 def parse_with_local_model(text: str) -> dict:
     """Parse text using locally loaded ML model"""
+    if not model or not tokenizer:
+        print("⚠️ Local model not available, using fallback")
+        return parse_fallback(text)
         
-        start_dt = None
-        if time_matches:
-            for match in time_matches:
-                hour = int(match[0] or match[2])
-                minute = int(match[1]) if match[1] else 0
-                if 0 <= hour <= 23 and 0 <= minute <= 59:
-                    start_dt = datetime.combine(now.date(), time(hour, minute))
-                    if start_dt < now:
-                        start_dt += timedelta(days=1)
-                    break
-        
-        return {
-            "title": text.strip(),
-            "datetime": start_dt,
-            "start": start_dt,
-            "end_datetime": None,
-            "tokens": words,
-            "labels": ["O"] * len(words),
-            "debug": {"note": "fallback parsing - ML model not available"}
-        }
+    now = datetime.now()
 
     words = text.split()
     encoding = tokenizer(words, is_split_into_words=True, return_tensors="pt", truncation=True, padding=True)

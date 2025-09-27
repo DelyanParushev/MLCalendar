@@ -166,7 +166,25 @@ def parse_event(payload: dict):
             }
         }
 
-    end = result.get("end_datetime")  # Get the end time from parse_text
+    # Convert string datetime to datetime object if needed
+    if isinstance(dt, str):
+        try:
+            dt = datetime.fromisoformat(dt.replace('Z', '+00:00'))
+        except ValueError:
+            return {
+                "error": "Невалиден формат на датата.",
+                "debug": {"raw_datetime": dt}
+            }
+
+    end = result.get("end_datetime") or result.get("end")  # Get the end time from parse_text
+    
+    # Convert string end datetime to datetime object if needed
+    if isinstance(end, str):
+        try:
+            end = datetime.fromisoformat(end.replace('Z', '+00:00'))
+        except ValueError:
+            end = None
+    
     # If no end time is specified, set it to start time + 1 hour
     if not end and dt:
         end = dt + timedelta(hours=1)

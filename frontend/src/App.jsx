@@ -19,6 +19,142 @@ function CalendarApp() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const { isAuthenticated, loading } = useAuth();
 
+  // Custom time indicator effect
+  useEffect(() => {
+    const updateTimeIndicator = () => {
+      const now = new Date();
+      const currentHour = now.getHours();
+      const currentMinute = now.getMinutes();
+      
+      console.log(`Current system time: ${currentHour}:${currentMinute.toString().padStart(2, '0')}`);
+      
+      // Check what view we're in using multiple methods
+      const calendarView = document.querySelector('.fc-view');
+      const viewClasses = calendarView ? calendarView.className : '';
+      console.log(`Calendar view classes: "${viewClasses}"`);
+      
+      // Also check for specific view type elements
+      const hasTimeGrid = document.querySelector('.fc-timegrid-view') || 
+                          document.querySelector('.fc-timeGridWeek-view') || 
+                          document.querySelector('.fc-timeGridDay-view') ||
+                          document.querySelector('[class*="timegrid"]') ||
+                          document.querySelector('[class*="timeGrid"]');
+      
+      const hasTimeSlots = document.querySelector('.fc-timegrid-slot') || 
+                          document.querySelector('.fc-timegrid-axis') ||
+                          document.querySelector('[class*="timegrid-slot"]');
+      
+      console.log(`Has time grid elements: ${!!hasTimeGrid}, Has time slots: ${!!hasTimeSlots}`);
+      
+      // Only proceed if we can find time grid elements (more reliable than class checking)
+      if (!hasTimeGrid && !hasTimeSlots) {
+        console.log('Not in a time grid view - no time grid elements found');
+        return;
+      }
+      
+      console.log('Time grid view detected - proceeding with indicator');
+      
+      // Wait a bit for FullCalendar to fully render time grid elements
+      setTimeout(() => {
+        // Find time grid views and add indicator using multiple selectors
+        const timeGridBodies = document.querySelectorAll('.fc-timegrid-body');
+        const alternativeBodies = document.querySelectorAll('.fc-scroller[class*="body"]');
+        const allBodies = [...timeGridBodies, ...alternativeBodies].filter((body, index, arr) => 
+          arr.indexOf(body) === index // Remove duplicates
+        );
+        
+        console.log(`Found ${timeGridBodies.length} time grid bodies, ${alternativeBodies.length} alternative bodies, ${allBodies.length} total unique bodies`);
+        
+        if (allBodies.length === 0) {
+          console.log('No time grid body elements found - trying to add indicator to time grid container');
+          
+          // Fallback: add to any time grid container we can find
+          const timeGridContainer = document.querySelector('.fc-timegrid') || 
+                                   document.querySelector('[class*="timegrid"]');
+          
+          if (timeGridContainer) {
+            allBodies.push(timeGridContainer);
+            console.log('Added time grid container as fallback body');
+          }
+        }
+        
+        allBodies.forEach((body, bodyIndex) => {
+          // Remove existing indicator
+          const existingIndicator = body.querySelector('.custom-time-indicator');
+          if (existingIndicator) {
+            existingIndicator.remove();
+          }
+
+          // Get all time slots to understand the structure
+          const timeSlots = body.querySelectorAll('.fc-timegrid-slot');
+          console.log(`Body ${bodyIndex}: Found ${timeSlots.length} time slots`);
+          
+          if (timeSlots.length > 0) {
+            // Get the first slot to determine slot height
+            const slotHeight = timeSlots[0].offsetHeight;
+            console.log(`Body ${bodyIndex}: Slot height: ${slotHeight}px`);
+            
+            // Try multiple ways to find the first time label
+            const timeLabels = document.querySelectorAll('.fc-timegrid-slot-label, .fc-timegrid-axis-cushion');
+            console.log(`Found ${timeLabels.length} time labels`);
+            
+            let startHour = 0;
+            let firstTimeLabelText = '00:00';
+            
+            if (timeLabels.length > 0) {
+              firstTimeLabelText = timeLabels[0].textContent.trim();
+              console.log(`First time label text: "${firstTimeLabelText}"`);
+              
+              // Try to parse the time - handle different formats
+              if (firstTimeLabelText.includes(':')) {
+                const timePart = firstTimeLabelText.split(':')[0];
+                startHour = parseInt(timePart) || 0;
+              } else if (firstTimeLabelText.includes('AM') || firstTimeLabelText.includes('PM')) {
+                // Handle 12-hour format
+                const match = firstTimeLabelText.match(/(\d+)/);
+                if (match) {
+                  startHour = parseInt(match[1]);
+                  if (firstTimeLabelText.includes('PM') && startHour !== 12) {
+                    startHour += 12;
+                  } else if (firstTimeLabelText.includes('AM') && startHour === 12) {
+                    startHour = 0;
+                  }
+                }
+              }
+            }
+            
+            console.log(`Body ${bodyIndex}: Calendar starts at hour: ${startHour}`);
+            
+            // Calculate position relative to the calendar's start time
+            const hoursFromStart = currentHour - startHour + (currentMinute / 60);
+            const topPosition = hoursFromStart * slotHeight;
+            
+            console.log(`Body ${bodyIndex}: Hours from start: ${hoursFromStart.toFixed(2)}, Position: ${topPosition}px`);
+            
+            // Only add indicator if current time is within reasonable range
+            if (hoursFromStart >= -1 && topPosition >= -slotHeight) {
+              const indicator = document.createElement('div');
+              indicator.className = 'custom-time-indicator';
+              indicator.style.top = `${Math.max(0, topPosition)}px`;
+              body.appendChild(indicator);
+              console.log(`Body ${bodyIndex}: Indicator added at position: ${Math.max(0, topPosition)}px`);
+            } else {
+              console.log(`Body ${bodyIndex}: Current time is outside visible range (hours from start: ${hoursFromStart.toFixed(2)})`);
+            }
+          } else {
+            console.log(`Body ${bodyIndex}: No time slots found in this body`);
+          }
+        });
+      }, 200); // Reduced timeout since we're being more aggressive about detection
+    };
+
+    // Update immediately and then every minute
+    const interval = setInterval(updateTimeIndicator, 60000);
+    updateTimeIndicator();
+
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchEvents();
@@ -110,7 +246,62 @@ function CalendarApp() {
               <FullCalendar
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 initialView="dayGridMonth"
-                nowIndicator={true} // Shows current time indicator
+                firstDay={1} // Start week from Monday (1) instead of Sunday (0)
+                nowIndicator={false} // Disable built-in indicator, using custom one
+                datesSet={() => {
+                  // Update custom time indicator when view changes
+                  setTimeout(() => {
+                    const updateTimeIndicator = () => {
+                      const now = new Date();
+                      const currentHour = now.getHours();
+                      const currentMinute = now.getMinutes();
+
+                      // Find time grid views and add indicator
+                      const timeGridBodies = document.querySelectorAll('.fc-timegrid-body');
+                      timeGridBodies.forEach(body => {
+                        // Remove existing indicator
+                        const existingIndicator = body.querySelector('.custom-time-indicator');
+                        if (existingIndicator) {
+                          existingIndicator.remove();
+                        }
+
+                        // Only add indicator if we're in a time grid view
+                        const viewType = document.querySelector('.fc-view')?.className || '';
+                        if (viewType.includes('fc-timegrid')) {
+                          // Get the actual slot height from FullCalendar
+                          const timeSlots = body.querySelectorAll('.fc-timegrid-slot');
+                          if (timeSlots.length > 0) {
+                            const slotHeight = timeSlots[0].offsetHeight;
+                            
+                            // Find what time the first slot represents
+                            const firstTimeLabel = document.querySelector('.fc-timegrid-slot-label');
+                            const firstTimeLabelText = firstTimeLabel ? firstTimeLabel.textContent : '00:00';
+                            
+                            // Parse the first time slot time
+                            let startHour = 0;
+                            if (firstTimeLabelText.includes(':')) {
+                              const parts = firstTimeLabelText.split(':');
+                              startHour = parseInt(parts[0]);
+                            }
+                            
+                            // Calculate position relative to the calendar's start time
+                            const hoursFromStart = currentHour - startHour + (currentMinute / 60);
+                            const topPosition = hoursFromStart * slotHeight;
+                            
+                            // Only add indicator if current time is within the visible range
+                            if (hoursFromStart >= 0 && topPosition >= 0) {
+                              const indicator = document.createElement('div');
+                              indicator.className = 'custom-time-indicator';
+                              indicator.style.top = `${topPosition}px`;
+                              body.appendChild(indicator);
+                            }
+                          }
+                        }
+                      });
+                    };
+                    updateTimeIndicator();
+                  }, 100);
+                }}
                 slotLabelFormat={{
                   hour: '2-digit',
                   minute: '2-digit',
@@ -179,8 +370,6 @@ function CalendarApp() {
                   week: 'Week',
                   day: 'Day'
                 }}
-                // Custom now indicator styling
-                nowIndicatorClassNames="fc-now-indicator-custom"
               />
             </div>
           </div>

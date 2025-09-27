@@ -110,7 +110,7 @@ const AuthForm = () => {
               Caltivity
             </h1>
           </div>
-          <p className="text-sm text-[color:var(--md-sys-color-on-surface-variant)] mb-4 italic">
+          <p className="text-base text-[color:var(--md-sys-color-on-surface-variant)] mb-6 italic font-medium">
             Turn your words into events—your calendar just got smarter.
           </p>
           <h2 className="text-xl font-medium text-[color:var(--md-sys-color-on-surface-variant)]">
@@ -226,7 +226,7 @@ const AuthForm = () => {
             <button
               type="button"
               onClick={toggleForm}
-              className="text-[color:var(--md-sys-color-primary)] hover:text-[color:var(--md-sys-color-primary)] hover:underline font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[color:var(--md-sys-color-primary)] focus:ring-opacity-20 rounded px-2 py-1"
+              className="bg-[color:var(--md-sys-color-surface-container-high)] text-[color:var(--md-sys-color-on-surface)] hover:bg-[color:var(--md-sys-color-primary)] hover:text-[color:var(--md-sys-color-on-primary)] font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[color:var(--md-sys-color-primary)] focus:ring-opacity-50 rounded-xl px-6 py-3 border border-[color:var(--md-sys-color-outline)] shadow-sm"
             >
               {isLogin 
                 ? "Don't have an account? Sign up" 

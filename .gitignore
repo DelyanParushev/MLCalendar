@@ -43,6 +43,8 @@ Thumbs.db
 
 # ML models (if large)
 ml/model/checkpoint-*/
+ml/model/*.safetensors
+ml/model/model.safetensors
 
 # Temporary files
 tmp/

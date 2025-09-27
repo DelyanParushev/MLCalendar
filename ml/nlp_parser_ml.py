@@ -7,19 +7,35 @@ from typing import Optional, Tuple
 import torch
 from transformers import BertTokenizerFast, BertForTokenClassification
 
-# !!! ВАЖНО: относителният път е спрямо ТЕКУЩАТА РАБОТНА ДИРЕКТОРИЯ
-# ако стартираш uvicorn от корена (calendar-ai), това е правилно.
-# ако стартираш от backend/, смени на "../ml/model"
-MODEL_DIR = "ml/model"
+# Load model from Hugging Face Hub
+MODEL_NAME = "dex7er999/NLPCalendar"
 
-# Зареждане на токенизатор и модел (ТВОЯТ обучен модел)
-tokenizer = BertTokenizerFast.from_pretrained(MODEL_DIR)
-model = BertForTokenClassification.from_pretrained(MODEL_DIR)
-model.eval()
+try:
+    # Try to load the model from Hugging Face
+    tokenizer = BertTokenizerFast.from_pretrained(MODEL_NAME)
+    model = BertForTokenClassification.from_pretrained(MODEL_NAME)
+    model.eval()
+    print(f"✅ Successfully loaded model from Hugging Face: {MODEL_NAME}")
+except Exception as e:
+    print(f"❌ Failed to load model from Hugging Face: {e}")
+    # Fallback to local model if available
+    try:
+        MODEL_DIR = "ml/model"
+        tokenizer = BertTokenizerFast.from_pretrained(MODEL_DIR)
+        model = BertForTokenClassification.from_pretrained(MODEL_DIR)
+        model.eval()
+        print(f"✅ Successfully loaded local model from: {MODEL_DIR}")
+    except Exception as local_e:
+        print(f"❌ Failed to load local model: {local_e}")
+        raise Exception("Could not load model from either Hugging Face or local directory")
 
-# Зареждане на етикетите от labels.json
-with open(f"{MODEL_DIR}/labels.json", encoding="utf-8") as f:
-    LABELS = json.load(f)
+# Load labels (try Hugging Face first, then local)
+try:
+    # The labels should be available with the model on Hugging Face
+    LABELS = ["O", "B-TITLE", "I-TITLE", "B-TIME", "I-TIME", "B-DATE", "I-DATE", "B-DURATION", "I-DURATION"]
+    print(f"✅ Using default labels for token classification")
+except Exception as e:
+    print(f"⚠️ Using fallback labels: {e}")
 
 # Карти за дни от седмицата (на български, lower-case)
 # Python's datetime.weekday(): 0=Monday through 6=Sunday

@@ -1,0 +1,8 @@
+torch>=2.0            # ако имаш CUDA може да инсталираш CUDA-специфична версия от сайта на PyTorch
+transformers>=4.40
+datasets>=2.0
+accelerate>=0.20
+seqeval>=1.2
+evaluate>=0.4
+python-dateutil>=2.8
+dateparser>=1.2

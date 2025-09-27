@@ -40,10 +40,10 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (username, password) => {
+  const login = async (email, password) => {
     try {
       const formData = new FormData();
-      formData.append('username', username);
+      formData.append('username', email); // Backend still expects 'username' field but we pass email
       formData.append('password', password);
       
       const { data } = await api.post('/login', formData);

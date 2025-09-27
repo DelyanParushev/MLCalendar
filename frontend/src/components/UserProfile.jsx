@@ -54,9 +54,9 @@ const UserProfile = () => {
                   logout();
                   setIsDropdownOpen(false);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-[color:var(--md-sys-color-on-surface)] hover:bg-[color:var(--md-sys-color-surface-container-highest)] transition-colors duration-200"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-[color:var(--md-sys-color-on-surface)] hover:bg-[color:var(--md-sys-color-surface-container-highest)] hover:text-[color:var(--md-sys-color-on-surface)] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[color:var(--md-sys-color-primary)] focus:ring-opacity-20"
               >
-                <span className="material-icons text-xl">logout</span>
+                <span className="material-icons text-xl text-[color:var(--md-sys-color-error)]">logout</span>
                 <span className="font-medium">Sign out</span>
               </button>
             </div>

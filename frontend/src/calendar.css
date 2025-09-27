@@ -179,3 +179,77 @@
   color: var(--md-sys-color-on-primary) !important;
   box-shadow: var(--md-shadow-level-2) !important;
 }
+
+/* Current time indicator */
+.fc .fc-timegrid-now-indicator-line {
+  border-top: 2px solid #ef4444 !important;
+  box-shadow: 0 0 4px rgba(239, 68, 68, 0.5) !important;
+}
+
+.fc .fc-timegrid-now-indicator-arrow {
+  border-top-color: #ef4444 !important;
+  border-bottom-color: #ef4444 !important;
+  margin-top: -1px !important;
+}
+
+.fc .fc-now-indicator-custom {
+  background-color: #ef4444 !important;
+  height: 2px !important;
+}
+
+.fc-current-time-indicator {
+  position: relative;
+}
+
+.fc-current-time-indicator::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #ef4444;
+  z-index: 999;
+  box-shadow: 0 0 4px rgba(239, 68, 68, 0.5);
+}
+
+.fc-current-time-indicator-dot {
+  position: absolute;
+  left: -4px;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  z-index: 1000;
+  box-shadow: 0 0 4px rgba(239, 68, 68, 0.5);
+}
+
+/* Ensure time indicator is visible in time grid views */
+.fc-timegrid .fc-current-time-indicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 999;
+}
+
+.fc-timegrid .fc-current-time-indicator::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #ef4444;
+  z-index: 999;
+}
+
+.fc-timegrid .fc-current-time-indicator-dot {
+  position: absolute;
+  left: -4px;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ef4444;
+  z-index: 1000;
+}

@@ -60,9 +60,13 @@ def get_user_by_username(db: Session, username: str):
     """Get user by username"""
     return db.query(models.User).filter(models.User.username == username).first()
 
-def authenticate_user(db: Session, username: str, password: str):
-    """Authenticate a user"""
-    user = get_user_by_username(db, username)
+def authenticate_user(db: Session, identifier: str, password: str):
+    """Authenticate a user by email or username"""
+    # Try to find user by email first, then by username
+    user = get_user_by_email(db, identifier)
+    if not user:
+        user = get_user_by_username(db, identifier)
+    
     if not user or not verify_password(password, user.hashed_password):
         return False
     return user
@@ -81,13 +85,13 @@ def get_current_user(
     try:
         token = credentials.credentials
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+        email: str = payload.get("sub")  # Now expecting email as subject
+        if email is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
     
-    user = get_user_by_username(db, username=username)
+    user = get_user_by_email(db, email=email)  # Look up by email
     if user is None:
         raise credentials_exception
     return user

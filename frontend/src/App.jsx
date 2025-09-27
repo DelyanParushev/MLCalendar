@@ -81,7 +81,7 @@ function CalendarApp() {
           <div className="flex items-center gap-2 sm:gap-4">
             <div className="flex items-center gap-2 sm:gap-3 text-[color:var(--md-sys-color-on-surface-variant)]">
               <span className="material-icons text-2xl sm:text-3xl text-[color:var(--md-sys-color-primary)]">calendar_today</span>
-              <h1 className="text-2xl sm:text-4xl font-medium transition-colors duration-200">NLP Calendar</h1>
+              <h1 className="text-2xl sm:text-4xl font-medium transition-colors duration-200">Caltivity</h1>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -110,6 +110,7 @@ function CalendarApp() {
               <FullCalendar
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 initialView="dayGridMonth"
+                nowIndicator={true} // Shows current time indicator
                 slotLabelFormat={{
                   hour: '2-digit',
                   minute: '2-digit',
@@ -178,6 +179,8 @@ function CalendarApp() {
                   week: 'Week',
                   day: 'Day'
                 }}
+                // Custom now indicator styling
+                nowIndicatorClassNames="fc-now-indicator-custom"
               />
             </div>
           </div>

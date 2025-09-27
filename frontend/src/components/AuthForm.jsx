@@ -25,8 +25,24 @@ const AuthForm = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.username.trim()) {
-      newErrors.username = 'Username is required';
+    if (isLogin) {
+      // For login, email is required
+      if (!formData.email.trim()) {
+        newErrors.email = 'Email is required';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        newErrors.email = 'Please enter a valid email';
+      }
+    } else {
+      // For registration, both email and username are required
+      if (!formData.email.trim()) {
+        newErrors.email = 'Email is required';
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        newErrors.email = 'Please enter a valid email';
+      }
+
+      if (!formData.username.trim()) {
+        newErrors.username = 'Username is required';
+      }
     }
 
     if (!formData.password) {
@@ -36,12 +52,6 @@ const AuthForm = () => {
     }
 
     if (!isLogin) {
-      if (!formData.email.trim()) {
-        newErrors.email = 'Email is required';
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-        newErrors.email = 'Please enter a valid email';
-      }
-
       if (!formData.confirmPassword) {
         newErrors.confirmPassword = 'Please confirm your password';
       } else if (formData.password !== formData.confirmPassword) {
@@ -62,7 +72,7 @@ const AuthForm = () => {
     try {
       let result;
       if (isLogin) {
-        result = await login(formData.username, formData.password);
+        result = await login(formData.email, formData.password);
       } else {
         result = await register(formData.email, formData.username, formData.password);
       }
@@ -97,9 +107,12 @@ const AuthForm = () => {
               calendar_today
             </span>
             <h1 className="text-3xl font-medium text-[color:var(--md-sys-color-on-surface)]">
-              NLP Calendar
+              Caltivity
             </h1>
           </div>
+          <p className="text-sm text-[color:var(--md-sys-color-on-surface-variant)] mb-4 italic">
+            Turn your words into events—your calendar just got smarter.
+          </p>
           <h2 className="text-xl font-medium text-[color:var(--md-sys-color-on-surface-variant)]">
             {isLogin ? 'Sign in to your account' : 'Create your account'}
           </h2>
@@ -113,45 +126,45 @@ const AuthForm = () => {
               </div>
             )}
 
+            <div className="mb-4">
+              <label htmlFor="email" className="block text-sm font-medium text-[color:var(--md-sys-color-on-surface-variant)] mb-2">
+                Email address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                className="w-full px-4 py-3 rounded-xl border border-[color:var(--md-sys-color-outline)] bg-[color:var(--md-sys-color-surface)] text-[color:var(--md-sys-color-on-surface)] placeholder-[color:var(--md-sys-color-on-surface-variant)] focus:ring-2 focus:ring-[color:var(--md-sys-color-primary)] focus:border-transparent outline-none transition-all"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={handleInputChange}
+              />
+              {errors.email && (
+                <p className="mt-1 text-sm text-[color:var(--md-sys-color-error)]">{errors.email}</p>
+              )}
+            </div>
+
             {!isLogin && (
               <div className="mb-4">
-                <label htmlFor="email" className="block text-sm font-medium text-[color:var(--md-sys-color-on-surface-variant)] mb-2">
-                  Email address
+                <label htmlFor="username" className="block text-sm font-medium text-[color:var(--md-sys-color-on-surface-variant)] mb-2">
+                  Username
                 </label>
                 <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
+                  id="username"
+                  name="username"
+                  type="text"
+                  autoComplete="username"
                   className="w-full px-4 py-3 rounded-xl border border-[color:var(--md-sys-color-outline)] bg-[color:var(--md-sys-color-surface)] text-[color:var(--md-sys-color-on-surface)] placeholder-[color:var(--md-sys-color-on-surface-variant)] focus:ring-2 focus:ring-[color:var(--md-sys-color-primary)] focus:border-transparent outline-none transition-all"
-                  placeholder="Enter your email"
-                  value={formData.email}
+                  placeholder="Enter your username"
+                  value={formData.username}
                   onChange={handleInputChange}
                 />
-                {errors.email && (
-                  <p className="mt-1 text-sm text-[color:var(--md-sys-color-error)]">{errors.email}</p>
+                {errors.username && (
+                  <p className="mt-1 text-sm text-[color:var(--md-sys-color-error)]">{errors.username}</p>
                 )}
               </div>
             )}
-
-            <div className="mb-4">
-              <label htmlFor="username" className="block text-sm font-medium text-[color:var(--md-sys-color-on-surface-variant)] mb-2">
-                Username
-              </label>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                autoComplete="username"
-                className="w-full px-4 py-3 rounded-xl border border-[color:var(--md-sys-color-outline)] bg-[color:var(--md-sys-color-surface)] text-[color:var(--md-sys-color-on-surface)] placeholder-[color:var(--md-sys-color-on-surface-variant)] focus:ring-2 focus:ring-[color:var(--md-sys-color-primary)] focus:border-transparent outline-none transition-all"
-                placeholder="Enter your username"
-                value={formData.username}
-                onChange={handleInputChange}
-              />
-              {errors.username && (
-                <p className="mt-1 text-sm text-[color:var(--md-sys-color-error)]">{errors.username}</p>
-              )}
-            </div>
 
             <div className="mb-4">
               <label htmlFor="password" className="block text-sm font-medium text-[color:var(--md-sys-color-on-surface-variant)] mb-2">
@@ -213,7 +226,7 @@ const AuthForm = () => {
             <button
               type="button"
               onClick={toggleForm}
-              className="text-[color:var(--md-sys-color-primary)] hover:text-[color:var(--md-sys-color-primary)] font-medium transition-colors"
+              className="text-[color:var(--md-sys-color-primary)] hover:text-[color:var(--md-sys-color-primary)] hover:underline font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[color:var(--md-sys-color-primary)] focus:ring-opacity-20 rounded px-2 py-1"
             >
               {isLogin 
                 ? "Don't have an account? Sign up" 

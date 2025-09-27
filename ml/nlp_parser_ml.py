@@ -5,59 +5,44 @@ from datetime import datetime, timedelta, time, date
 from typing import Optional, Tuple
 import os
 
-# Control ML model loading - can be enabled via environment variable
+# Disable ML loading for deployment to save memory
 ENABLE_ML_MODEL = os.getenv("ENABLE_ML_MODEL", "true").lower() == "true"
+
+# Import ML libraries with fallback
+if ENABLE_ML_MODEL:
+    try:
+        import torch
+        from transformers import BertTokenizerFast, BertForTokenClassification
+        ML_AVAILABLE = True
+        print("🤖 ML libraries loaded successfully")
+    except ImportError as e:
+        print(f"⚠️ ML libraries not available: {e}")
+        ML_AVAILABLE = False
+else:
+    print("🚫 ML model loading disabled to save memory")
+    ML_AVAILABLE = False
+
+# Load model from Hugging Face Hub
+MODEL_NAME = "dex7er999/NLPCalendar"
 
 # Initialize model variables
 tokenizer = None
 model = None
-ML_AVAILABLE = False
-MODEL_NAME = "dex7er999/NLPCalendar"
-
-def load_ml_model():
-    """Lazy loading of ML model to save memory"""
-    global tokenizer, model, ML_AVAILABLE
-    
-    if not ENABLE_ML_MODEL:
-        print("🚫 ML model loading disabled via environment variable")
-        return False
-        
-    if ML_AVAILABLE:
-        return True  # Already loaded
-        
-    try:
-        print(f"📥 Loading ML model from Hugging Face: {MODEL_NAME}")
-        import torch
-        from transformers import BertTokenizerFast, BertForTokenClassification
-        
-        # Load with memory optimization
-        tokenizer = BertTokenizerFast.from_pretrained(MODEL_NAME)
-        model = BertForTokenClassification.from_pretrained(
-            MODEL_NAME,
-            torch_dtype=torch.float16,  # Use half precision to save memory
-            low_cpu_mem_usage=True      # Use less memory during loading
-        )
-        model.eval()
-        
-        # Move to CPU to save GPU memory if available
-        if hasattr(model, 'cpu'):
-            model = model.cpu()
-        
-        ML_AVAILABLE = True
-        print(f"✅ Successfully loaded ML model: {MODEL_NAME}")
-        return True
-        
-    except ImportError as e:
-        print(f"⚠️ ML libraries not available: {e}")
-        return False
-    except Exception as e:
-        print(f"❌ Failed to load ML model: {e}")
-        return False
-
-# Default labels for token classification
 LABELS = ["O", "B-TITLE", "I-TITLE", "B-TIME", "I-TIME", "B-DATE", "I-DATE", "B-DURATION", "I-DURATION"]
 
-print(f"🤖 ML Model loading enabled: {ENABLE_ML_MODEL}")
+if ENABLE_ML_MODEL and ML_AVAILABLE:
+    try:
+        print(f"📥 Loading model from Hugging Face: {MODEL_NAME}")
+        # Try to load the model from Hugging Face
+        tokenizer = BertTokenizerFast.from_pretrained(MODEL_NAME)
+        model = BertForTokenClassification.from_pretrained(MODEL_NAME)
+        model.eval()
+        print(f"✅ Successfully loaded model from Hugging Face: {MODEL_NAME}")
+    except Exception as e:
+        print(f"❌ Failed to load model from Hugging Face: {e}")
+        ML_AVAILABLE = False
+
+print(f"🤖 ML Model available: {ML_AVAILABLE}")
 
 # Карти за дни от седмицата (на български, lower-case)
 # Python's datetime.weekday(): 0=Monday through 6=Sunday
@@ -227,90 +212,63 @@ def parse_text(text: str) -> dict:
     if not text or not text.strip():
         return {"title": "", "datetime": None, "tokens": [], "labels": [], "debug": {"note": "empty text"}}
     
-    # Try to load ML model if enabled
-    ml_loaded = load_ml_model()
-    
-    if not ml_loaded or model is None or tokenizer is None:
+    # If ML is not available, return a simple fallback
+    if not ML_AVAILABLE or model is None or tokenizer is None:
         print("⚠️ ML model not available, using simple fallback parsing")
-        return _fallback_parse(text)
-    
-    # Use ML model for parsing
-    try:
-        import torch
-        
         words = text.split()
-        encoding = tokenizer(words, is_split_into_words=True, return_tensors="pt", truncation=True, padding=True)
+        
+        # Simple fallback - try to extract basic info
+        now = datetime.now()
+        
+        # Look for common time patterns
+        time_pattern = r'\b(\d{1,2})[:\.](\d{2})\b|\b(\d{1,2})\s*часа?\b'
+        time_matches = re.findall(time_pattern, text.lower())
+        
+        start_dt = None
+        if time_matches:
+            for match in time_matches:
+                hour = int(match[0] or match[2])
+                minute = int(match[1]) if match[1] else 0
+                if 0 <= hour <= 23 and 0 <= minute <= 59:
+                    start_dt = datetime.combine(now.date(), time(hour, minute))
+                    if start_dt < now:
+                        start_dt += timedelta(days=1)
+                    break
+        
+        return {
+            "title": text.strip(),
+            "datetime": start_dt,
+            "start": start_dt,
+            "end_datetime": None,
+            "tokens": words,
+            "labels": ["O"] * len(words),
+            "debug": {"note": "fallback parsing - ML model not available"}
+        }
 
-        with torch.no_grad():
-            outputs = model(input_ids=encoding["input_ids"], attention_mask=encoding["attention_mask"])
-        logits = outputs.logits
-        pred_ids = torch.argmax(logits, dim=-1).squeeze().tolist()
-
-        word_ids = encoding.word_ids(batch_index=0)
-        labels = []
-        current = None
-        
-        # First pass - get model predictions
-        for idx, wid in enumerate(word_ids):
-            if wid is None:
-                continue
-            if wid != current:
-                current = wid
-                label_id = pred_ids[idx]
-                labels.append(LABELS[label_id])
-        
-        # Second pass - fix weekday labels if model missed them
-        fixed_labels = []
-        for word, label in zip(words, labels):
-            if label == "O" and word.lower() in WEEKDAYS:
-                fixed_labels.append("B-DATE")
-            else:
-                fixed_labels.append(label)
-        
-        labels = fixed_labels
-        tokens = words
-        
-        # Continue with entity extraction logic...
-        return _process_ml_results(tokens, labels)
-        
-    except Exception as e:
-        print(f"❌ Error during ML inference: {e}")
-        return _fallback_parse(text)
-
-def _process_ml_results(tokens, labels):
-    """Process ML model results to extract calendar event information"""
-
-def _fallback_parse(text: str) -> dict:
-    """Simple fallback parsing when ML model is not available"""
     words = text.split()
+    encoding = tokenizer(words, is_split_into_words=True, return_tensors="pt", truncation=True, padding=True)
+
+    with torch.no_grad():
+        outputs = model(input_ids=encoding["input_ids"], attention_mask=encoding["attention_mask"])
+    logits = outputs.logits
+    pred_ids = torch.argmax(logits, dim=-1).squeeze().tolist()
+
+    word_ids = encoding.word_ids(batch_index=0)
+    labels = []
+    current = None
     
-    # Simple fallback - try to extract basic info
-    now = datetime.now()
+    # First pass - get model predictions
+    for idx, wid in enumerate(word_ids):
+        if wid is None:
+            continue
+        if wid != current:
+            current = wid
+            label_id = pred_ids[idx]
+            labels.append(LABELS[label_id])
     
-    # Look for common time patterns
-    time_pattern = r'\b(\d{1,2})[:\.](\d{2})\b|\b(\d{1,2})\s*часа?\b'
-    time_matches = re.findall(time_pattern, text.lower())
-    
-    start_dt = None
-    if time_matches:
-        for match in time_matches:
-            hour = int(match[0] or match[2])
-            minute = int(match[1]) if match[1] else 0
-            if 0 <= hour <= 23 and 0 <= minute <= 59:
-                start_dt = datetime.combine(now.date(), time(hour, minute))
-                if start_dt < now:
-                    start_dt += timedelta(days=1)
-                break
-    
-    return {
-        "title": text.strip(),
-        "datetime": start_dt,
-        "start": start_dt,
-        "end_datetime": None,
-        "tokens": words,
-        "labels": ["O"] * len(words),
-        "debug": {"note": "fallback parsing - ML model not available"}
-    }
+    # Second pass - fix weekday labels if model missed them
+    fixed_labels = []
+    for word, label in zip(words, labels):
         if label == "O" and word.lower() in WEEKDAYS:
             # If it's a weekday but was labeled as Other, fix it
             fixed_labels.append("B-WHEN_DAY")

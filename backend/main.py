@@ -15,13 +15,21 @@ load_dotenv()
 app = FastAPI(title="AI Calendar API", version="0.2.0")
 
 # CORS configuration from environment
-cors_origins = os.getenv("CORS_ORIGINS", "*").split(",")
+cors_origins = os.getenv("CORS_ORIGINS", "*")
+if cors_origins == "*":
+    cors_origins = ["*"]
+else:
+    cors_origins = [origin.strip() for origin in cors_origins.split(",")]
+
+print(f"🌐 CORS Origins: {cors_origins}")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Database initialization with error handling

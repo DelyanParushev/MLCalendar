@@ -9,6 +9,5 @@ python-jose[cryptography]>=3.3.0
 passlib[bcrypt]>=1.7.4
 python-multipart>=0.0.6
 psycopg2>=2.9.0
-gunicorn>=21.0.0
 torch>=2.0.0
 transformers>=4.30.0

@@ -3,39 +3,52 @@ import re
 import json
 from datetime import datetime, timedelta, time, date
 from typing import Optional, Tuple
+import os
 
-import torch
-from transformers import BertTokenizerFast, BertForTokenClassification
+# Import ML libraries with fallback
+try:
+    import torch
+    from transformers import BertTokenizerFast, BertForTokenClassification
+    ML_AVAILABLE = True
+    print("🤖 ML libraries loaded successfully")
+except ImportError as e:
+    print(f"⚠️ ML libraries not available: {e}")
+    ML_AVAILABLE = False
 
 # Load model from Hugging Face Hub
 MODEL_NAME = "dex7er999/NLPCalendar"
 
-try:
-    # Try to load the model from Hugging Face
-    tokenizer = BertTokenizerFast.from_pretrained(MODEL_NAME)
-    model = BertForTokenClassification.from_pretrained(MODEL_NAME)
-    model.eval()
-    print(f"✅ Successfully loaded model from Hugging Face: {MODEL_NAME}")
-except Exception as e:
-    print(f"❌ Failed to load model from Hugging Face: {e}")
-    # Fallback to local model if available
-    try:
-        MODEL_DIR = "ml/model"
-        tokenizer = BertTokenizerFast.from_pretrained(MODEL_DIR)
-        model = BertForTokenClassification.from_pretrained(MODEL_DIR)
-        model.eval()
-        print(f"✅ Successfully loaded local model from: {MODEL_DIR}")
-    except Exception as local_e:
-        print(f"❌ Failed to load local model: {local_e}")
-        raise Exception("Could not load model from either Hugging Face or local directory")
+# Initialize model variables
+tokenizer = None
+model = None
+LABELS = ["O", "B-TITLE", "I-TITLE", "B-TIME", "I-TIME", "B-DATE", "I-DATE", "B-DURATION", "I-DURATION"]
 
-# Load labels (try Hugging Face first, then local)
-try:
-    # The labels should be available with the model on Hugging Face
-    LABELS = ["O", "B-TITLE", "I-TITLE", "B-TIME", "I-TIME", "B-DATE", "I-DATE", "B-DURATION", "I-DURATION"]
-    print(f"✅ Using default labels for token classification")
-except Exception as e:
-    print(f"⚠️ Using fallback labels: {e}")
+if ML_AVAILABLE:
+    try:
+        print(f"📥 Loading model from Hugging Face: {MODEL_NAME}")
+        # Try to load the model from Hugging Face
+        tokenizer = BertTokenizerFast.from_pretrained(MODEL_NAME)
+        model = BertForTokenClassification.from_pretrained(MODEL_NAME)
+        model.eval()
+        print(f"✅ Successfully loaded model from Hugging Face: {MODEL_NAME}")
+    except Exception as e:
+        print(f"❌ Failed to load model from Hugging Face: {e}")
+        # Fallback to local model if available
+        try:
+            MODEL_DIR = "ml/model"
+            if os.path.exists(MODEL_DIR):
+                tokenizer = BertTokenizerFast.from_pretrained(MODEL_DIR)
+                model = BertForTokenClassification.from_pretrained(MODEL_DIR)
+                model.eval()
+                print(f"✅ Successfully loaded local model from: {MODEL_DIR}")
+            else:
+                print(f"⚠️ Local model directory not found: {MODEL_DIR}")
+                ML_AVAILABLE = False
+        except Exception as local_e:
+            print(f"❌ Failed to load local model: {local_e}")
+            ML_AVAILABLE = False
+
+print(f"🤖 ML Model available: {ML_AVAILABLE}")
 
 # Карти за дни от седмицата (на български, lower-case)
 # Python's datetime.weekday(): 0=Monday through 6=Sunday
@@ -203,7 +216,40 @@ def _find_daytime_hint(tokens: list[str], labels: list[str]) -> Optional[time]:
 
 def parse_text(text: str) -> dict:
     if not text or not text.strip():
-        return {"title": "", "datetime": None, "tokens": [], "labels": [], "debug": {"model_dir": MODEL_DIR, "note": "empty text"}}
+        return {"title": "", "datetime": None, "tokens": [], "labels": [], "debug": {"note": "empty text"}}
+    
+    # If ML is not available, return a simple fallback
+    if not ML_AVAILABLE or model is None or tokenizer is None:
+        print("⚠️ ML model not available, using simple fallback parsing")
+        words = text.split()
+        
+        # Simple fallback - try to extract basic info
+        now = datetime.now()
+        
+        # Look for common time patterns
+        time_pattern = r'\b(\d{1,2})[:\.](\d{2})\b|\b(\d{1,2})\s*часа?\b'
+        time_matches = re.findall(time_pattern, text.lower())
+        
+        start_dt = None
+        if time_matches:
+            for match in time_matches:
+                hour = int(match[0] or match[2])
+                minute = int(match[1]) if match[1] else 0
+                if 0 <= hour <= 23 and 0 <= minute <= 59:
+                    start_dt = datetime.combine(now.date(), time(hour, minute))
+                    if start_dt < now:
+                        start_dt += timedelta(days=1)
+                    break
+        
+        return {
+            "title": text.strip(),
+            "datetime": start_dt,
+            "start": start_dt,
+            "end_datetime": None,
+            "tokens": words,
+            "labels": ["O"] * len(words),
+            "debug": {"note": "fallback parsing - ML model not available"}
+        }
 
     words = text.split()
     encoding = tokenizer(words, is_split_into_words=True, return_tensors="pt", truncation=True, padding=True)

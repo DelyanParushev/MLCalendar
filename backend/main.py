@@ -24,8 +24,44 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# DB init
-Base.metadata.create_all(bind=engine)
+# Database initialization with error handling
+@app.on_event("startup")
+async def startup_event():
+    try:
+        # Create all tables
+        Base.metadata.create_all(bind=engine)
+        
+        # For PostgreSQL, run initial setup
+        database_url = os.getenv("DATABASE_URL", "")
+        if database_url.startswith("postgresql://") or database_url.startswith("postgres://"):
+            print("🐘 PostgreSQL detected - running initial setup...")
+            
+            # Create admin user if not exists
+            session = SessionLocal()
+            try:
+                admin_user = session.query(models.User).filter_by(username="admin").first()
+                if not admin_user:
+                    print("👤 Creating default admin user...")
+                    admin_user = models.User(
+                        email="admin@example.com",
+                        username="admin",
+                        hashed_password=auth.get_password_hash("admin"),
+                        created_at=datetime.utcnow(),
+                        is_active=True
+                    )
+                    session.add(admin_user)
+                    session.commit()
+                    print("✅ Admin user created successfully!")
+            except Exception as e:
+                session.rollback()
+                print(f"⚠️ Error creating admin user: {e}")
+            finally:
+                session.close()
+        
+        print("✅ Database initialization completed!")
+    except Exception as e:
+        print(f"❌ Database initialization error: {e}")
+        # Don't crash the app, let it start anyway
 
 def get_db():
     db = SessionLocal()

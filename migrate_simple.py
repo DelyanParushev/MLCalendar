@@ -8,11 +8,26 @@ from datetime import datetime
 from backend.auth import get_password_hash
 
 def migrate_database():
-    db_path = "events.db"
+    # Get database URL from environment
+    database_url = os.getenv("DATABASE_URL", "sqlite:///./events.db")
     
+    # Handle different database types
+    if database_url.startswith("postgresql://") or database_url.startswith("postgres://"):
+        print("🐘 PostgreSQL detected - migration will run on app startup")
+        return True
+    
+    # SQLite migration
+    if database_url.startswith("sqlite:///"):
+        db_path = database_url.replace("sqlite:///", "")
+    else:
+        db_path = "events.db"
+    
+    print(f"📁 Database path: {db_path}")
+    
+    # Create database file if it doesn't exist
     if not os.path.exists(db_path):
-        print("❌ Database doesn't exist!")
-        return False
+        print("📝 Creating new database...")
+        open(db_path, 'a').close()
     
     print("Starting database migration...")
     

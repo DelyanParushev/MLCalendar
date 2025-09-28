@@ -19,9 +19,8 @@ const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEven
 
   const formatDateTwoLines = (date) => {
     const dt = DateTime.fromJSDate(date);
-    const dayName = dt.toFormat('cccc'); // Sunday, Monday, etc.
-    const dateString = dt.toFormat('dd LLLL yyyy'); // 28 September 2025
-    return { dayName, dateString };
+    const fullDateString = dt.toFormat('cccc, dd LLLL yyyy'); // Sunday, 28 September 2025
+    return { fullDateString };
   };
 
   const handleDateClick = (arg) => {
@@ -31,7 +30,7 @@ const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEven
   return (
     <div className="space-y-4 flex flex-col items-center">
       {/* Calendar Grid - Compact for List View */}
-      <div className="rounded-2xl shadow-level-2 bg-[color:var(--md-sys-color-surface-container)] border border-[color:var(--md-sys-color-outline)] overflow-hidden" style={{ width: '380px', maxWidth: '380px' }}>
+      <div className="rounded-2xl shadow-level-2 bg-[color:var(--md-sys-color-surface-container)] overflow-hidden" style={{ width: '380px', maxWidth: '380px' }}>
         <div className="list-view-calendar rounded-2xl overflow-hidden" style={{ width: '380px', maxWidth: '380px', overflow: 'hidden', margin: '0 auto', backgroundColor: 'transparent' }}>
           <FullCalendar
             plugins={[dayGridPlugin, interactionPlugin]}
@@ -98,22 +97,19 @@ const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEven
 
       {/* Events List */}
       <div 
-        className="rounded-2xl shadow-level-2 bg-[color:var(--md-sys-color-surface-container)] border border-[color:var(--md-sys-color-outline)] overflow-hidden"
+        className="rounded-2xl shadow-level-2 bg-[color:var(--md-sys-color-surface-container)] overflow-hidden"
         style={{ width: '380px', minWidth: '380px', maxWidth: '380px' }}
       >
         <div 
-          className="bg-[color:var(--md-sys-color-surface-container-high)] border-b border-[color:var(--md-sys-color-outline)]"
+          className="bg-[color:var(--md-sys-color-surface-container-high)]"
           style={{ padding: '16px', width: '380px', minWidth: '380px', maxWidth: '380px', boxSizing: 'border-box' }}
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-            <div style={{ textAlign: 'left', flex: '1', minWidth: '0', maxWidth: '280px' }}>
-              <div className="text-sm font-medium text-[color:var(--md-sys-color-on-surface)]">
-                {formatDateTwoLines(selectedDate).dayName}
+            <div style={{ textAlign: 'left', flex: '1', minWidth: '0', maxWidth: '240px' }}>
+              <div className="text-sm font-medium text-[color:var(--md-sys-color-on-surface)]" style={{ marginBottom: '8px' }}>
+                {formatDateTwoLines(selectedDate).fullDateString}
               </div>
-              <div className="text-xs font-medium text-[color:var(--md-sys-color-on-surface-variant)]">
-                {formatDateTwoLines(selectedDate).dateString}
-              </div>
-              <p className="text-xs text-[color:var(--md-sys-color-on-surface-variant)]" style={{ marginTop: '4px' }}>
+              <p className="text-xs text-[color:var(--md-sys-color-on-surface-variant)]">
                 {eventsForSelectedDate.length} {eventsForSelectedDate.length === 1 ? 'събитие' : 'събития'}
               </p>
             </div>

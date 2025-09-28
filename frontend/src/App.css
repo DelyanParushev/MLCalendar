@@ -258,11 +258,13 @@
 .list-view-calendar .fc-scrollgrid {
   border-radius: 12px !important;
   overflow: hidden !important;
+  border: none !important;
+  background-color: transparent !important;
 }
 
 .list-view-calendar .fc-theme-standard td,
 .list-view-calendar .fc-theme-standard th {
-  border-color: var(--md-sys-color-outline-variant) !important;
+  border: none !important;
 }
 
 .list-view-calendar .fc-daygrid-body table {
@@ -349,7 +351,7 @@
 
 /* iPhone-style calendar grid - List view only */
 .list-view-calendar .fc-daygrid-body .fc-daygrid-day {
-  border: 1px solid var(--md-sys-color-outline-variant) !important;
+  border: none !important;
 }
 
 .list-view-calendar .fc-daygrid-day.fc-day-today {
@@ -408,12 +410,15 @@
 /* Remove any background bleeding */
 .list-view-calendar .fc-scrollgrid-section {
   background-color: transparent !important;
+  border: none !important;
 }
 
 .list-view-calendar .fc-scrollgrid-section-body {
   background-color: transparent !important;
+  border: none !important;
 }
 
 .list-view-calendar .fc-daygrid {
   background-color: transparent !important;
+  border: none !important;
 }

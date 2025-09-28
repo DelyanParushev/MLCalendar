@@ -31,13 +31,13 @@ const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEven
   return (
     <div className="space-y-4 flex flex-col items-center">
       {/* Calendar Grid - Compact for List View */}
-      <div className="rounded-2xl shadow-level-2 bg-[color:var(--md-sys-color-surface-container)] border border-[color:var(--md-sys-color-outline)] overflow-hidden" style={{ width: '290px', maxWidth: '290px' }}>
-        <div className="list-view-calendar rounded-2xl overflow-hidden" style={{ width: '280px', maxWidth: '280px', overflow: 'hidden', margin: '5px auto' }}>
+      <div className="rounded-2xl shadow-level-2 bg-[color:var(--md-sys-color-surface-container)] border border-[color:var(--md-sys-color-outline)] overflow-hidden" style={{ width: '380px', maxWidth: '380px' }}>
+        <div className="list-view-calendar rounded-2xl overflow-hidden" style={{ width: '380px', maxWidth: '380px', overflow: 'hidden', margin: '0 auto' }}>
           <FullCalendar
             plugins={[dayGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
             firstDay={1}
-            height={320} // Increased height to show full calendar with last row
+            height={420} // Increased height to show full calendar with last row
             aspectRatio={1.0} // Square aspect ratio
             dateClick={handleDateClick}
           headerToolbar={{
@@ -97,14 +97,14 @@ const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEven
       {/* Events List */}
       <div 
         className="rounded-2xl shadow-level-2 bg-[color:var(--md-sys-color-surface-container)] border border-[color:var(--md-sys-color-outline)] overflow-hidden"
-        style={{ width: '290px', minWidth: '290px', maxWidth: '290px' }}
+        style={{ width: '380px', minWidth: '380px', maxWidth: '380px' }}
       >
         <div 
           className="bg-[color:var(--md-sys-color-surface-container-high)] border-b border-[color:var(--md-sys-color-outline)]"
-          style={{ padding: '16px', width: '290px', minWidth: '290px', maxWidth: '290px', boxSizing: 'border-box' }}
+          style={{ padding: '16px', width: '380px', minWidth: '380px', maxWidth: '380px', boxSizing: 'border-box' }}
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-            <div style={{ textAlign: 'left', flex: '1', minWidth: '0', maxWidth: '200px' }}>
+            <div style={{ textAlign: 'left', flex: '1', minWidth: '0', maxWidth: '280px' }}>
               <div className="text-sm font-medium text-[color:var(--md-sys-color-on-surface)]">
                 {formatDateTwoLines(selectedDate).dayName}
               </div>
@@ -130,7 +130,7 @@ const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEven
 
         <div 
           className="max-h-80 overflow-y-auto"
-          style={{ width: '290px', minWidth: '290px', maxWidth: '290px' }}
+          style={{ width: '380px', minWidth: '380px', maxWidth: '380px' }}
         >
           {eventsForSelectedDate.length === 0 ? (
             <div className="p-4 text-center">
@@ -149,7 +149,7 @@ const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEven
                 <div
                   key={event.id}
                   className="hover:bg-[color:var(--md-sys-color-surface-container-high)] transition-colors duration-200 group"
-                  style={{ padding: '12px 16px', width: '290px', minWidth: '290px', maxWidth: '290px', boxSizing: 'border-box' }}
+                  style={{ padding: '12px 16px', width: '380px', minWidth: '380px', maxWidth: '380px', boxSizing: 'border-box' }}
                 >
                   <div style={{ position: 'relative', width: '100%', minHeight: '40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ position: 'absolute', left: '0px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', width: 'calc(100% - 100px)' }}>

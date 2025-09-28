@@ -32,13 +32,15 @@ const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEven
     <div className="space-y-4 flex flex-col items-center">
       {/* Calendar Grid - Compact for List View */}
       <div className="rounded-2xl shadow-level-2 bg-[color:var(--md-sys-color-surface-container)] border border-[color:var(--md-sys-color-outline)] overflow-hidden" style={{ width: '380px', maxWidth: '380px' }}>
-        <div className="list-view-calendar rounded-2xl overflow-hidden" style={{ width: '380px', maxWidth: '380px', overflow: 'hidden', margin: '0 auto' }}>
+        <div className="list-view-calendar rounded-2xl overflow-hidden" style={{ width: '380px', maxWidth: '380px', overflow: 'hidden', margin: '0 auto', backgroundColor: 'transparent' }}>
           <FullCalendar
             plugins={[dayGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
             firstDay={1}
-            height={420} // Increased height to show full calendar with last row
+            height={370} // Height for 6 rows of 54px + headers
             aspectRatio={1.0} // Square aspect ratio
+            fixedWeekCount={false} // Don't show extra weeks from next month
+            showNonCurrentDates={false} // Hide dates from other months
             dateClick={handleDateClick}
           headerToolbar={{
             left: "prev,next",

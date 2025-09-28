@@ -225,16 +225,34 @@
 .list-view-calendar .fc-daygrid-day {
   min-height: 54px !important;
   max-height: 54px !important;
+  height: 54px !important;
   width: 54px !important;
   min-width: 54px !important;
   max-width: 54px !important;
-  padding: 3px !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Force the day cell content to be exactly square */
+.list-view-calendar .fc-daygrid-day::before {
+  content: '' !important;
+  display: block !important;
+  width: 54px !important;
+  height: 54px !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: -1 !important;
 }
 
 .list-view-calendar .fc-daygrid-body {
   width: 380px !important; /* 7 days × 54px */
-  min-height: 340px !important; /* Increased proportionally for full 6+ rows */
-  overflow: visible !important; /* Allow full calendar to show */
+  min-height: 324px !important; /* 6 weeks × 54px = 324px to show all dates */
+  max-height: 324px !important;
+  overflow: hidden !important;
+  background-color: transparent !important;
 }
 
 .list-view-calendar .fc-scrollgrid {
@@ -250,21 +268,39 @@
 .list-view-calendar .fc-daygrid-body table {
   table-layout: fixed !important;
   width: 380px !important;
+  border-spacing: 0 !important;
+  border-collapse: separate !important;
+}
+
+/* Force table rows to exact height */
+.list-view-calendar .fc-daygrid-body tr {
+  height: 54px !important;
+  min-height: 54px !important;
+  max-height: 54px !important;
 }
 
 .list-view-calendar .fc-daygrid-body td {
   width: 54px !important;
   min-width: 54px !important;
   max-width: 54px !important;
+  height: 54px !important;
+  min-height: 54px !important;
+  max-height: 54px !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  vertical-align: middle !important;
 }
 
 .list-view-calendar .fc-col-header-cell {
-  padding: 4px 2px !important;
-  min-height: 54px !important;
+  padding: 8px 2px !important;
+  height: 40px !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
   width: 54px !important;
   max-width: 54px !important;
   text-align: center !important;
   vertical-align: middle !important;
+  box-sizing: border-box !important;
 }
 
 .list-view-calendar .fc-col-header-cell .fc-col-header-cell-cushion {
@@ -336,4 +372,48 @@
 
 .list-view-calendar .fc-daygrid-body {
   overflow: hidden !important;
+}
+
+/* Perfect square cells with centered content */
+.list-view-calendar .fc-daygrid-day-frame {
+  height: 54px !important;
+  min-height: 54px !important;
+  max-height: 54px !important;
+  width: 54px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background-color: transparent !important;
+  box-sizing: border-box !important;
+}
+
+/* Ensure day numbers are centered in square cells */
+.list-view-calendar .fc-daygrid-day-top {
+  height: 54px !important;
+  width: 54px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+}
+
+/* Force day number content to be centered */
+.list-view-calendar .fc-daygrid-day-number {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+}
+
+/* Remove any background bleeding */
+.list-view-calendar .fc-scrollgrid-section {
+  background-color: transparent !important;
+}
+
+.list-view-calendar .fc-scrollgrid-section-body {
+  background-color: transparent !important;
+}
+
+.list-view-calendar .fc-daygrid {
+  background-color: transparent !important;
 }

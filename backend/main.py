@@ -1,5 +1,5 @@
 # backend/main.py
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
@@ -164,6 +164,8 @@ def parse_event(payload: dict):
         print(f"🔍 Parse result: {result}")
         
         dt = result.get("datetime") or result.get("start")  # Backwards compatibility
+        print(f"📅 Parsed datetime object: {dt} (type: {type(dt)})")
+        
         if dt is None:
             return {
                 "error": "Не можах да разбера датата/часа.",
@@ -177,7 +179,14 @@ def parse_event(payload: dict):
         # Convert string datetime to datetime object if needed
         if isinstance(dt, str):
             try:
-                dt = datetime.fromisoformat(dt.replace('Z', '+00:00'))
+                # Handle various datetime string formats
+                if dt.endswith('Z'):
+                    dt = datetime.fromisoformat(dt.replace('Z', '+00:00'))
+                elif '+' in dt or dt.endswith(('00:00', '+0000')):
+                    dt = datetime.fromisoformat(dt)
+                else:
+                    # Naive datetime string - parse without timezone
+                    dt = datetime.fromisoformat(dt)
                 print(f"🔍 Converted datetime: {dt}")
             except ValueError as e:
                 print(f"❌ DateTime conversion error: {e}")
@@ -191,7 +200,14 @@ def parse_event(payload: dict):
         # Convert string end datetime to datetime object if needed
         if isinstance(end, str):
             try:
-                end = datetime.fromisoformat(end.replace('Z', '+00:00'))
+                # Handle various datetime string formats
+                if end.endswith('Z'):
+                    end = datetime.fromisoformat(end.replace('Z', '+00:00'))
+                elif '+' in end or end.endswith(('00:00', '+0000')):
+                    end = datetime.fromisoformat(end)
+                else:
+                    # Naive datetime string - parse without timezone
+                    end = datetime.fromisoformat(end)
                 print(f"🔍 Converted end datetime: {end}")
             except ValueError:
                 print("⚠️ Could not convert end datetime, will calculate from start")
@@ -210,11 +226,17 @@ def parse_event(payload: dict):
             "error": "Вътрешна грешка при парсиране.",
             "debug": {"exception": str(e)}
         }
+    
+    # Generate ISO format strings
+    start_iso = dt.isoformat()
+    end_iso = end.isoformat() if end else None
+    
+    print(f"📤 Returning to frontend - Start ISO: {start_iso}, End ISO: {end_iso}")
         
     return {
         "title": result.get("title", ""),
-        "start": dt.isoformat(),
-        "end": end.isoformat() if end else None,
+        "start": start_iso,
+        "end": end_iso,
         "tokens": result.get("tokens", []),
         "labels": result.get("labels", []),
         "debug": result.get("debug", {})
@@ -227,12 +249,43 @@ def create_event(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(auth.get_current_active_user)
 ):
+    print(f"🔍 Creating event with payload: {payload}")
+    
     # Check if we have pre-parsed data
     if "title" in payload and "start" in payload:
         # Use pre-parsed data from frontend
-        start = datetime.fromisoformat(payload["start"])
-        # If end time is not specified, set it to start time + 1 hour
-        end = datetime.fromisoformat(payload["end"]) if payload.get("end") else (start + timedelta(hours=1))
+        # Parse the datetime and ensure it's timezone-aware
+        start_str = payload["start"]
+        print(f"📅 Original start string: {start_str}")
+        
+        if start_str.endswith('Z'):
+            # Handle UTC format
+            start = datetime.fromisoformat(start_str.replace('Z', '+00:00'))
+        elif '+' in start_str or start_str.endswith(('00:00', '+0000')):
+            # Already has timezone info
+            start = datetime.fromisoformat(start_str)
+        else:
+            # No timezone info - assume it's the user's local time
+            # Parse as naive datetime and don't add timezone info
+            start = datetime.fromisoformat(start_str)
+            print(f"🕐 Parsed start time (naive): {start}")
+        
+        # Handle end time similarly
+        if payload.get("end"):
+            end_str = payload["end"]
+            print(f"📅 Original end string: {end_str}")
+            
+            if end_str.endswith('Z'):
+                end = datetime.fromisoformat(end_str.replace('Z', '+00:00'))
+            elif '+' in end_str or end_str.endswith(('00:00', '+0000')):
+                end = datetime.fromisoformat(end_str)
+            else:
+                end = datetime.fromisoformat(end_str)
+                print(f"🕐 Parsed end time (naive): {end}")
+        else:
+            # If no end time, set it to start time + 1 hour
+            end = start + timedelta(hours=1)
+            print(f"🕐 Calculated end time: {end}")
         
         obj = models.Event(
             title=payload["title"],
@@ -241,6 +294,8 @@ def create_event(
             raw_text=payload.get("raw_text"),
             owner_id=current_user.id
         )
+        
+        print(f"💾 Saving event - Title: {obj.title}, Start: {obj.start}, End: {obj.end}")
     else:
         # Parse from raw text
         text = payload.get("text", "")

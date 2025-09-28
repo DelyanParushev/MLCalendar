@@ -35,8 +35,11 @@ export default function AddEventForm({ onSaved, isDarkMode }) {
       setLoading(true)
       setError('') // Clear previous errors
       
-      console.log('Attempting to save event:', preview)
-      console.log('Auth token exists:', !!localStorage.getItem('token'))
+      console.log('💾 Saving event with data:', {
+        title: preview.title,
+        start: preview.start,
+        end: preview.end
+      })
       
       await createEvent({
         title: preview.title,
@@ -49,9 +52,7 @@ export default function AddEventForm({ onSaved, isDarkMode }) {
       setPreview(null)
       onSaved?.()
     } catch (err) {
-      console.error('Error saving event:', err)
-      console.error('Error response:', err.response?.data)
-      console.error('Error status:', err.response?.status)
+      console.error('❌ Error saving event:', err.response?.data || err.message)
       
       // Provide more specific error messages
       if (err.response?.status === 401) {

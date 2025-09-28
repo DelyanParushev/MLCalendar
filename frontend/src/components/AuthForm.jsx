@@ -151,9 +151,12 @@ function AuthForm() {
                   display: 'inline-block',
                   marginRight: '0.25rem',
                   color: animationColor,
-                  transition: 'color 0.5s ease',
+                  backgroundColor: animationColor === '#ff1361' ? 'lightpink' : 'lightblue',
+                  transition: 'all 0.5s ease',
                   cursor: 'pointer',
-                  border: '1px solid red'
+                  border: '2px solid red',
+                  padding: '2px 4px',
+                  fontWeight: 'bold'
                 }}
               >Turn</span>
               <span style={{display: 'inline-block', marginRight: '0.25rem'}}>your</span>

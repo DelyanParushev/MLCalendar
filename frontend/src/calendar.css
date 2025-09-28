@@ -248,20 +248,8 @@
   transform: scale(0.94) !important;
   animation: scale 3s forwards cubic-bezier(0.5, 1, 0.89, 1) !important;
   
-  /* Gradient text animation from first CodePen */
-  background-image: linear-gradient(
-    -225deg,
-    #231557 0%,
-    #44107a 29%,
-    #ff1361 67%,
-    #fff800 100%
-  ) !important;
-  background-size: 200% auto !important;
-  color: #fff !important;
-  background-clip: text !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  animation: scale 3s forwards cubic-bezier(0.5, 1, 0.89, 1), textclip 2s 2s linear infinite !important;
+  /* Use solid color instead of gradient for now */
+  color: #ff1361 !important;
 }
 
 .tagline-container .tagline-animated span {

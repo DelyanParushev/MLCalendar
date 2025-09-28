@@ -263,8 +263,8 @@
 
 .tagline-animated span {
   display: inline-block !important;
-  opacity: 0 !important;
-  filter: blur(4px) !important;
+  opacity: 1 !important;
+  filter: blur(0) !important;
   margin-right: 0.25rem !important;
 }
 

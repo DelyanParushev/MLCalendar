@@ -110,9 +110,14 @@ const AuthForm = () => {
               Caltivity
             </h1>
           </div>
-          <p className="text-base text-[color:var(--md-sys-color-on-surface-variant)] mb-6 italic font-medium">
-            Turn your words into events—your calendar just got smarter.
-          </p>
+          <div className="mb-6 text-center">
+            <p className="text-lg font-medium tagline-line-1">
+              Turn your words into events.
+            </p>
+            <p className="text-lg font-medium italic tagline-line-2">
+              Your calendar just got smarter.
+            </p>
+          </div>
           <h2 className="text-xl font-medium text-[color:var(--md-sys-color-on-surface-variant)]">
             {isLogin ? 'Sign in to your account' : 'Create your account'}
           </h2>

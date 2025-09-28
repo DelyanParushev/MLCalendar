@@ -215,6 +215,45 @@
   display: none !important;
 }
 
+/* Tagline animations */
+@keyframes colorShift {
+  0% { color: #3b82f6; }
+  16.666% { color: #ef4444; }
+  33.333% { color: #10b981; }
+  50% { color: #f59e0b; }
+  66.666% { color: #8b5cf6; }
+  83.333% { color: #ec4899; }
+  100% { color: #3b82f6; }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tagline-animated {
+  animation: colorShift 6s infinite, fadeInUp 1s ease-out;
+  animation-fill-mode: both;
+}
+
+.tagline-line-1 {
+  animation: fadeInUp 1s ease-out, colorShift 6s infinite;
+  animation-delay: 0s, 0.5s;
+  animation-fill-mode: both;
+}
+
+.tagline-line-2 {
+  animation: fadeInUp 1s ease-out, colorShift 6s infinite;
+  animation-delay: 0.3s, 1s;
+  animation-fill-mode: both;
+}
+
 .fc-current-time-indicator {
   position: relative;
 }

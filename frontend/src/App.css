@@ -132,7 +132,7 @@
 .list-view-calendar .fc-toolbar {
   justify-content: center !important;
   padding: 8px 0 !important;
-  margin-bottom: 8px !important;
+  margin: 8px 0 8px 0 !important; /* Equal top and bottom margin */
   position: relative !important;
 }
 
@@ -144,14 +144,14 @@
 
 .list-view-calendar .fc-toolbar-chunk:first-child {
   position: absolute !important;
-  left: 0 !important;
+  left: 14px !important; /* Align left edge of arrow button with first letter of "Mon" */
   top: 50% !important;
   transform: translateY(-50%) !important;
 }
 
 .list-view-calendar .fc-toolbar-chunk:last-child {
   position: absolute !important;
-  right: 0 !important;
+  right: 14px !important; /* Align right edge of Today button with last letter of "Sun" */
   top: 50% !important;
   transform: translateY(-50%) !important;
 }
@@ -180,7 +180,7 @@
 
 .list-view-calendar .fc-today-button {
   padding: 4px 8px !important;
-  font-size: 11px !important;
+  font-size: 14px !important; /* Same as date display below */
   border-radius: 16px !important;
   background-color: transparent !important;
   background: none !important;
@@ -249,9 +249,9 @@
 
 .list-view-calendar .fc-daygrid-body {
   width: 380px !important; /* 7 days × 54px */
-  min-height: 324px !important; /* 6 weeks × 54px = 324px to show all dates */
-  max-height: 324px !important;
-  overflow: hidden !important;
+  min-height: 270px !important; /* 5 weeks × 54px = 270px minimum */
+  max-height: 324px !important; /* 6 weeks × 54px = 324px maximum */
+  overflow: visible !important; /* Allow content to show properly */
   background-color: transparent !important;
 }
 
@@ -421,4 +421,22 @@
 .list-view-calendar .fc-daygrid {
   background-color: transparent !important;
   border: none !important;
+}
+
+/* Selected date complete border - List view only */
+.list-view-calendar .fc-daygrid-day.selected-date {
+  box-shadow: inset 0 0 0 2px var(--md-sys-color-primary) !important;
+  border-radius: 12px !important;
+  z-index: 10 !important;
+  position: relative !important;
+}
+
+/* Today date styling - List view only */
+.list-view-calendar .fc-daygrid-day.today-date {
+  background-color: var(--md-sys-color-primary-container) !important;
+}
+
+.list-view-calendar .fc-daygrid-day.today-date .fc-daygrid-day-number {
+  color: var(--md-sys-color-on-primary-container) !important;
+  font-weight: 500 !important;
 }

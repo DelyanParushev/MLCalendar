@@ -36,7 +36,7 @@ const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEven
             plugins={[dayGridPlugin, interactionPlugin]}
             initialView="dayGridMonth"
             firstDay={1}
-            height={370} // Height for 6 rows of 54px + headers
+            height="auto" // Let it size based on content
             aspectRatio={1.0} // Square aspect ratio
             fixedWeekCount={false} // Don't show extra weeks from next month
             showNonCurrentDates={false} // Hide dates from other months
@@ -58,7 +58,9 @@ const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEven
           eventDisplay="none" // Don't show events as blocks, we'll add dots instead
           dayCellClassNames={(arg) => {
             const cellDateStr = DateTime.fromJSDate(arg.date).toFormat('yyyy-MM-dd');
+            const todayDateStr = DateTime.now().toFormat('yyyy-MM-dd');
             const isSelected = cellDateStr === selectedDateStr;
+            const isToday = cellDateStr === todayDateStr;
             const hasEvents = events.some(event => {
               const eventStart = DateTime.fromISO(event.start, { setZone: true });
               return eventStart.toFormat('yyyy-MM-dd') === cellDateStr;
@@ -66,8 +68,10 @@ const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEven
             
             return `rounded-lg transition-colors duration-200 cursor-pointer relative ${
               isSelected 
-                ? 'bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)] ring-2 ring-[color:var(--md-sys-color-primary)]' 
-                : 'bg-[color:var(--md-sys-color-surface-container-highest)] text-[color:var(--md-sys-color-on-surface)] hover:bg-[color:var(--md-sys-color-surface-container-high)]'
+                ? 'selected-date bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)]' 
+                : isToday
+                  ? 'today-date bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)] font-medium'
+                  : 'bg-[color:var(--md-sys-color-surface-container-highest)] text-[color:var(--md-sys-color-on-surface)] hover:bg-[color:var(--md-sys-color-surface-container-high)]'
             } ${hasEvents ? 'has-events' : ''}`;
           }}
           dayCellContent={(arg) => {
@@ -165,16 +169,24 @@ const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEven
                           margin: '0',
                           paddingLeft: '8px',
                           overflow: 'hidden',
-                          textOverflow: 'ellipsis'
+                          textAlign: 'left',
+                          lineHeight: '1.4',
+                          alignSelf: 'center'
                         }}
                       >
                         {event.title}
                       </h4>
                     </div>
                     <div style={{ position: 'absolute', right: '0px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div className="text-xs text-[color:var(--md-sys-color-on-surface-variant)]" style={{ textAlign: 'right', lineHeight: '1.2' }}>
-                        <div>{formatTime(event.start)}</div>
-                        {event.end && <div>{formatTime(event.end)}</div>}
+                      <div style={{ textAlign: 'right', lineHeight: '1.3', display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                        <div className="text-sm font-medium text-[color:var(--md-sys-color-on-surface)]" style={{ fontSize: '13px' }}>
+                          {formatTime(event.start)}
+                        </div>
+                        {event.end && (
+                          <div className="text-sm text-[color:var(--md-sys-color-on-surface-variant)]" style={{ fontSize: '13px' }}>
+                            {formatTime(event.end)}
+                          </div>
+                        )}
                       </div>
                       <button
                         onClick={() => {

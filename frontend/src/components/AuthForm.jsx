@@ -174,11 +174,17 @@ function AuthForm() {
           </div>
         </div>
 
-        <h2 className="text-xl font-medium text-[color:var(--md-sys-color-primary)] text-center -mb-4">
-          {isLogin ? 'Sign in to your account' : 'Create your account'}
-        </h2>
-        <form className="-mt-4 space-y-4" onSubmit={handleSubmit}>
+        <form 
+          className="space-y-4" 
+          onSubmit={handleSubmit}
+        >
           <div className="bg-[color:var(--md-sys-color-surface-container)] rounded-2xl p-6 shadow-level-2">
+            <h2 
+              className="text-xl font-medium text-[color:var(--md-sys-color-primary)] text-center mb-4"
+            >
+              {isLogin ? 'Sign in to your account' : 'Create your account'}
+            </h2>
+            
             {errors.general && (
               <div className="mb-4 p-3 rounded-xl bg-[color:var(--md-sys-color-error-container)] text-[color:var(--md-sys-color-on-error-container)] text-sm">
                 {errors.general}

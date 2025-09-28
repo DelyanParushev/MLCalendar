@@ -33,6 +33,11 @@ export default function AddEventForm({ onSaved, isDarkMode }) {
     if (!preview) return
     try {
       setLoading(true)
+      setError('') // Clear previous errors
+      
+      console.log('Attempting to save event:', preview)
+      console.log('Auth token exists:', !!localStorage.getItem('token'))
+      
       await createEvent({
         title: preview.title,
         start: preview.start,
@@ -44,8 +49,20 @@ export default function AddEventForm({ onSaved, isDarkMode }) {
       setPreview(null)
       onSaved?.()
     } catch (err) {
-      console.error(err)
-      setError('Грешка при запис на събитието.')
+      console.error('Error saving event:', err)
+      console.error('Error response:', err.response?.data)
+      console.error('Error status:', err.response?.status)
+      
+      // Provide more specific error messages
+      if (err.response?.status === 401) {
+        setError('Не сте влезли в системата. Моля, влезте отново.')
+      } else if (err.response?.status === 403) {
+        setError('Нямате права за създаване на събития.')
+      } else if (err.response?.data?.detail) {
+        setError(`Грешка: ${err.response.data.detail}`)
+      } else {
+        setError('Грешка при запис на събитието.')
+      }
     } finally {
       setLoading(false)
     }

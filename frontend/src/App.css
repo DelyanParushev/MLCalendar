@@ -67,3 +67,293 @@
   display: inline-block !important;
   margin-right: 0.25rem !important;
 }
+
+/* Modal and List view animations */
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  /* Better spacing on mobile for list view */
+  .mobile-list-spacing {
+    padding: 1rem !important;
+  }
+  
+  /* Smaller calendar height on mobile for list view */
+  .mobile-calendar-compact {
+    height: 350px !important;
+  }
+  
+  /* Modal takes more screen space on mobile */
+  .mobile-modal {
+    margin: 1rem;
+    max-height: 95vh;
+  }
+  
+  /* Compact header spacing */
+  .mobile-header {
+    margin-bottom: 1.5rem !important;
+  }
+}
+
+/* Custom FullCalendar overrides for List View ONLY */
+.list-view-calendar .fc-toolbar-title {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  text-align: center !important;
+  width: 100% !important;
+}
+
+.list-view-calendar .fc-toolbar {
+  justify-content: center !important;
+  padding: 8px 0 !important;
+  margin-bottom: 8px !important;
+  position: relative !important;
+}
+
+.list-view-calendar .fc-toolbar-chunk {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.list-view-calendar .fc-toolbar-chunk:first-child {
+  position: absolute !important;
+  left: 0 !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+.list-view-calendar .fc-toolbar-chunk:last-child {
+  position: absolute !important;
+  right: 0 !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+.list-view-calendar .fc-button {
+  padding: 4px 8px !important;
+  margin: 0 2px !important;
+  font-size: 12px !important;
+  min-width: auto !important;
+  width: auto !important;
+}
+
+.list-view-calendar .fc-prev-button,
+.list-view-calendar .fc-next-button {
+  padding: 0 !important;
+  margin: 0 3px !important;
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 14px !important;
+  min-width: 28px !important;
+}
+
+.list-view-calendar .fc-today-button {
+  padding: 4px 8px !important;
+  font-size: 11px !important;
+  border-radius: 16px !important;
+  background-color: transparent !important;
+  background: none !important;
+  border: none !important;
+  color: var(--md-sys-color-primary) !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+}
+
+.list-view-calendar .fc-today-button:hover {
+  background-color: transparent !important;
+  background: none !important;
+  color: var(--md-sys-color-primary) !important;
+  opacity: 0.8 !important;
+  box-shadow: none !important;
+}
+
+/* More specific selector to override FullCalendar defaults */
+.list-view-calendar .fc .fc-today-button {
+  background-color: transparent !important;
+  background: none !important;
+  border: none !important;
+  color: var(--md-sys-color-primary) !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+}
+
+.list-view-calendar .fc-toolbar {
+  justify-content: center !important;
+}
+
+.list-view-calendar .fc-toolbar-chunk {
+  display: flex !important;
+  justify-content: center !important;
+}
+
+.list-view-calendar .fc-daygrid-day-number {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+.list-view-calendar .fc-daygrid-day {
+  min-height: 40px !important;
+  max-height: 40px !important;
+  width: 40px !important;
+  min-width: 40px !important;
+  max-width: 40px !important;
+  padding: 2px !important;
+}
+
+.list-view-calendar .fc-daygrid-body {
+  width: 280px !important; /* 7 days × 40px */
+  min-height: 260px !important; /* Increased for full 6+ rows */
+  overflow: visible !important; /* Allow full calendar to show */
+}
+
+.list-view-calendar .fc-scrollgrid {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+.list-view-calendar .fc-theme-standard td,
+.list-view-calendar .fc-theme-standard th {
+  border-color: var(--md-sys-color-outline-variant) !important;
+}
+
+.list-view-calendar .fc-daygrid-body table {
+  table-layout: fixed !important;
+  width: 280px !important;
+}
+
+.list-view-calendar .fc-daygrid-body td {
+  width: 40px !important;
+  min-width: 40px !important;
+  max-width: 40px !important;
+}
+
+.list-view-calendar .fc-col-header-cell {
+  padding: 4px 2px !important;
+  min-height: 40px !important;
+  width: 40px !important;
+  max-width: 40px !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+.list-view-calendar .fc-col-header-cell .fc-col-header-cell-cushion {
+  display: inline-block !important;
+}
+
+.list-view-calendar .fc-col-header {
+  width: 280px !important;
+  max-width: 280px !important;
+}
+
+.list-view-calendar .fc-scrollgrid-sync-table {
+  width: 280px !important;
+  max-width: 280px !important;
+}
+
+.list-view-calendar .fc-scrollgrid {
+  width: 280px !important;
+  max-width: 280px !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  background-color: transparent !important;
+}
+
+.list-view-calendar .fc-view-harness {
+  width: 280px !important;
+  max-width: 280px !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+.list-view-calendar .fc-view {
+  width: 280px !important;
+  max-width: 280px !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+.list-view-calendar .fc {
+  width: 280px !important;
+  max-width: 280px !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  background-color: transparent !important;
+}
+
+.list-view-calendar .fc-scrollgrid {
+  width: 280px !important;
+  max-width: 280px !important;
+}
+
+.list-view-calendar .fc-view-harness {
+  width: 280px !important;
+  max-width: 280px !important;
+}
+
+.list-view-calendar .fc-view {
+  width: 280px !important;
+  max-width: 280px !important;
+}
+
+.list-view-calendar .fc {
+  width: 280px !important;
+  max-width: 280px !important;
+}
+
+/* iPhone-style calendar grid - List view only */
+.list-view-calendar .fc-daygrid-body .fc-daygrid-day {
+  border: 1px solid var(--md-sys-color-outline-variant) !important;
+}
+
+.list-view-calendar .fc-daygrid-day.fc-day-today {
+  background-color: transparent !important;
+}
+
+/* Hide event blocks since we use custom dots - List view only */
+.list-view-calendar .fc-daygrid-event-harness {
+  display: none !important;
+}
+
+.list-view-calendar .fc-daygrid-day-events {
+  display: none !important;
+}
+
+/* Remove scrollbars in List view */
+.list-view-calendar .fc-scroller {
+  overflow: hidden !important;
+}
+
+.list-view-calendar .fc-daygrid-body {
+  overflow: hidden !important;
+}

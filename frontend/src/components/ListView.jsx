@@ -8,12 +8,13 @@ const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEven
   // Get events for the selected date
   const selectedDateStr = DateTime.fromJSDate(selectedDate).toFormat('yyyy-MM-dd');
   const eventsForSelectedDate = events.filter(event => {
-    const eventStart = DateTime.fromISO(event.start);
+    const eventStart = DateTime.fromISO(event.start, { setZone: true });
     return eventStart.toFormat('yyyy-MM-dd') === selectedDateStr;
-  }).sort((a, b) => DateTime.fromISO(a.start).toMillis() - DateTime.fromISO(b.start).toMillis());
+  }).sort((a, b) => DateTime.fromISO(a.start, { setZone: true }).toMillis() - DateTime.fromISO(b.start, { setZone: true }).toMillis());
 
   const formatTime = (isoString) => {
-    return DateTime.fromISO(isoString).toFormat('HH:mm');
+    // Parse as local time instead of UTC
+    return DateTime.fromISO(isoString, { setZone: true }).toFormat('HH:mm');
   };
 
   const formatDateTwoLines = (date) => {
@@ -47,8 +48,8 @@ const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEven
           events={events.map((e) => ({
             id: e.id,
             title: e.title,
-            start: DateTime.fromISO(e.start).toISO(),
-            end: e.end ? DateTime.fromISO(e.end).toISO() : undefined,
+            start: e.start, // Use raw datetime string, don't convert timezone
+            end: e.end || undefined, // Use raw datetime string
             className: "rounded-lg",
             display: 'background', // Show as background color to indicate there are events
           }))}
@@ -58,7 +59,7 @@ const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEven
             const cellDateStr = DateTime.fromJSDate(arg.date).toFormat('yyyy-MM-dd');
             const isSelected = cellDateStr === selectedDateStr;
             const hasEvents = events.some(event => {
-              const eventStart = DateTime.fromISO(event.start);
+              const eventStart = DateTime.fromISO(event.start, { setZone: true });
               return eventStart.toFormat('yyyy-MM-dd') === cellDateStr;
             });
             
@@ -72,7 +73,7 @@ const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEven
             const cellDateStr = DateTime.fromJSDate(arg.date).toFormat('yyyy-MM-dd');
             const isSelected = cellDateStr === selectedDateStr;
             const hasEvents = events.some(event => {
-              const eventStart = DateTime.fromISO(event.start);
+              const eventStart = DateTime.fromISO(event.start, { setZone: true });
               return eventStart.toFormat('yyyy-MM-dd') === cellDateStr;
             });
             

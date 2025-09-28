@@ -325,8 +325,8 @@ function CalendarApp() {
                     events={events.map((e) => ({
                       id: e.id,
                       title: e.title,
-                      start: DateTime.fromISO(e.start).toISO(),
-                      end: e.end ? DateTime.fromISO(e.end).toISO() : undefined,
+                      start: e.start, // Use raw datetime string, don't convert timezone
+                      end: e.end || undefined, // Use raw datetime string
                       className: "animate-fade-in rounded-xl",
                       extendedProps: {
                         originalEvent: e

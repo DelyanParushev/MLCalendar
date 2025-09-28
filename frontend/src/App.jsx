@@ -19,10 +19,29 @@ import "./App.css";
 function CalendarApp() {
   const [events, setEvents] = useState([]);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [viewMode, setViewMode] = useState('standard'); // 'standard' or 'list'
+  const [viewMode, setViewMode] = useState(() => {
+    // Detect device type based on screen width and set default view mode
+    if (typeof window !== 'undefined') {
+      return window.innerWidth <= 768 ? 'list' : 'standard'; // Mobile: list, Desktop: standard
+    }
+    return 'standard'; // Fallback for SSR
+  });
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showAddEventModal, setShowAddEventModal] = useState(false);
   const { isAuthenticated, loading } = useAuth();
+
+  // Handle responsive view mode on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      const isMobile = window.innerWidth <= 768;
+      // Only auto-switch if user hasn't manually changed the view
+      // You could add a flag to track manual changes if needed
+      setViewMode(isMobile ? 'list' : 'standard');
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Custom time indicator effect
   useEffect(() => {

@@ -46,3 +46,27 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Tagline animations - testing in App.css */
+@keyframes simple-test {
+  0% { color: #ff1361; }
+  50% { color: #3b82f6; }
+  100% { color: #ff1361; }
+}
+
+@keyframes scale-test {
+  0% { transform: scale(0.94); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(0.94); }
+}
+
+.tagline-animated {
+  color: #ff1361 !important;
+  animation: scale-test 3s infinite !important;
+}
+
+.tagline-animated span:first-child {
+  animation: simple-test 2s infinite !important;
+  display: inline-block !important;
+  margin-right: 0.25rem !important;
+}

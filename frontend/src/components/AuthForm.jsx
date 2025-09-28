@@ -110,13 +110,21 @@ const AuthForm = () => {
               Caltivity
             </h1>
           </div>
-          <div className="mb-6 text-center">
-            <p className="text-lg font-medium tagline-line-1">
-              Turn your words into events.
-            </p>
-            <p className="text-lg font-medium italic tagline-line-2">
-              Your calendar just got smarter.
-            </p>
+          <div className="mb-6 text-center tagline-container">
+            <h2 className="text-2xl font-medium tagline-animated line-1">
+              <span>Turn</span>
+              <span>your</span>
+              <span>words</span>
+              <span>into</span>
+              <span>events.</span>
+            </h2>
+            <h2 className="text-2xl font-medium tagline-animated line-2">
+              <span>Your</span>
+              <span>calendar</span>
+              <span>just</span>
+              <span>got</span>
+              <span>smarter.</span>
+            </h2>
           </div>
           <h2 className="text-xl font-medium text-[color:var(--md-sys-color-on-surface-variant)]">
             {isLogin ? 'Sign in to your account' : 'Create your account'}

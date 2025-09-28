@@ -217,12 +217,19 @@
 
 /* Tagline animations - combining fade-in with blur and gradient color animation */
 @keyframes textclip {
-  to {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
     background-position: 200% center;
   }
 }
 
 @keyframes fade-in {
+  0% {
+    opacity: 0;
+    filter: blur(4px);
+  }
   100% {
     opacity: 1;
     filter: blur(0);
@@ -230,81 +237,87 @@
 }
 
 @keyframes scale {
+  0% {
+    transform: scale(0.94);
+  }
   100% {
     transform: scale(1);
   }
 }
 
 .tagline-container {
-  max-width: 40ch;
-  margin: 0 auto;
+  max-width: 40ch !important;
+  margin: 0 auto !important;
 }
 
 .tagline-animated {
-  transform: scale(0.94);
-  animation: scale 3s forwards cubic-bezier(0.5, 1, 0.89, 1), textclip 2s 2s linear infinite;
-  text-align: center;
-  line-height: 1.4;
+  transform: scale(0.94) !important;
+  animation: scale 3s forwards cubic-bezier(0.5, 1, 0.89, 1), textclip 2s 2s linear infinite !important;
+  text-align: center !important;
+  line-height: 1.4 !important;
   background-image: linear-gradient(
     -225deg,
     #231557 0%,
     #44107a 29%,
     #ff1361 67%,
     #fff800 100%
-  );
-  background-size: 200% auto;
-  color: #fff;
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-fill-color: transparent;
+  ) !important;
+  background-size: 200% auto !important;
+  color: #fff !important;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  display: inline-block !important;
+  margin: 0.25rem 0 !important;
 }
 
 .tagline-animated span {
-  display: inline-block;
-  opacity: 0;
-  filter: blur(4px);
-  margin-right: 0.25rem;
+  display: inline-block !important;
+  opacity: 0 !important;
+  filter: blur(4px) !important;
+  margin-right: 0.25rem !important;
 }
 
-.tagline-animated span:nth-child(1) {
-  animation: fade-in 0.8s 0.1s forwards cubic-bezier(0.11, 0, 0.5, 0);
+/* First line animations */
+.tagline-animated.line-1 span:nth-child(1) {
+  animation: fade-in 0.8s 0.1s forwards cubic-bezier(0.11, 0, 0.5, 0) !important;
 }
 
-.tagline-animated span:nth-child(2) {
-  animation: fade-in 0.8s 0.2s forwards cubic-bezier(0.11, 0, 0.5, 0);
+.tagline-animated.line-1 span:nth-child(2) {
+  animation: fade-in 0.8s 0.2s forwards cubic-bezier(0.11, 0, 0.5, 0) !important;
 }
 
-.tagline-animated span:nth-child(3) {
-  animation: fade-in 0.8s 0.3s forwards cubic-bezier(0.11, 0, 0.5, 0);
+.tagline-animated.line-1 span:nth-child(3) {
+  animation: fade-in 0.8s 0.3s forwards cubic-bezier(0.11, 0, 0.5, 0) !important;
 }
 
-.tagline-animated span:nth-child(4) {
-  animation: fade-in 0.8s 0.4s forwards cubic-bezier(0.11, 0, 0.5, 0);
+.tagline-animated.line-1 span:nth-child(4) {
+  animation: fade-in 0.8s 0.4s forwards cubic-bezier(0.11, 0, 0.5, 0) !important;
 }
 
-.tagline-animated span:nth-child(5) {
-  animation: fade-in 0.8s 0.5s forwards cubic-bezier(0.11, 0, 0.5, 0);
+.tagline-animated.line-1 span:nth-child(5) {
+  animation: fade-in 0.8s 0.5s forwards cubic-bezier(0.11, 0, 0.5, 0) !important;
 }
 
-.tagline-animated span:nth-child(6) {
-  animation: fade-in 0.8s 0.7s forwards cubic-bezier(0.11, 0, 0.5, 0);
+/* Second line animations */
+.tagline-animated.line-2 span:nth-child(1) {
+  animation: fade-in 0.8s 0.7s forwards cubic-bezier(0.11, 0, 0.5, 0) !important;
 }
 
-.tagline-animated span:nth-child(7) {
-  animation: fade-in 0.8s 0.8s forwards cubic-bezier(0.11, 0, 0.5, 0);
+.tagline-animated.line-2 span:nth-child(2) {
+  animation: fade-in 0.8s 0.8s forwards cubic-bezier(0.11, 0, 0.5, 0) !important;
 }
 
-.tagline-animated span:nth-child(8) {
-  animation: fade-in 0.8s 0.9s forwards cubic-bezier(0.11, 0, 0.5, 0);
+.tagline-animated.line-2 span:nth-child(3) {
+  animation: fade-in 0.8s 0.9s forwards cubic-bezier(0.11, 0, 0.5, 0) !important;
 }
 
-.tagline-animated span:nth-child(9) {
-  animation: fade-in 0.8s 1.0s forwards cubic-bezier(0.11, 0, 0.5, 0);
+.tagline-animated.line-2 span:nth-child(4) {
+  animation: fade-in 0.8s 1.0s forwards cubic-bezier(0.11, 0, 0.5, 0) !important;
 }
 
-.tagline-animated span:nth-child(10) {
-  animation: fade-in 0.8s 1.1s forwards cubic-bezier(0.11, 0, 0.5, 0);
+.tagline-animated.line-2 span:nth-child(5) {
+  animation: fade-in 0.8s 1.1s forwards cubic-bezier(0.11, 0, 0.5, 0) !important;
 }
 
 .fc-current-time-indicator {

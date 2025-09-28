@@ -2,31 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 function AuthForm() {
-  const [animationColor, setAnimationColor] = useState('#ff1361');
-  const [testMessage, setTestMessage] = useState('Click Turn to test');
+  const [visibleSpans, setVisibleSpans] = useState(new Set());
   
   useEffect(() => {
-    console.log('AuthForm mounted, starting interval');
-    const interval = setInterval(() => {
-      console.log('Changing color...');
-      setAnimationColor(prev => {
-        const newColor = prev === '#ff1361' ? '#3b82f6' : '#ff1361';
-        console.log('Color changed to:', newColor);
-        return newColor;
-      });
-    }, 1000); // Change color every 1 second
+    console.log('Starting fade-in animation');
+    
+    // Animation timing from CodePen: 0.1s, 0.2s, 0.3s, etc.
+    const delays = [100, 200, 300, 400, 500, 700, 800, 900, 1000, 1100]; // ms
+    
+    delays.forEach((delay, index) => {
+      setTimeout(() => {
+        console.log(`Making span ${index + 1} visible`);
+        setVisibleSpans(prev => new Set(prev).add(index));
+      }, delay);
+    });
     
     return () => {
-      console.log('Cleaning up interval');
-      clearInterval(interval);
+      console.log('Cleaning up fade-in animation');
     };
   }, []);
-
-  const handleTurnClick = () => {
-    console.log('Turn clicked!');
-    setAnimationColor(prev => prev === '#ff1361' ? '#3b82f6' : '#ff1361');
-    setTestMessage('Clicked! Color should change');
-  };
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
@@ -136,39 +130,46 @@ function AuthForm() {
             </h1>
           </div>
           <div className="mb-6 text-center tagline-container">
-            <p style={{fontSize: '12px', color: '#666'}}>{testMessage}</p>
             <h2 
-              className="text-2xl font-medium tagline-animated test-animation"
+              className="text-2xl font-medium"
               style={{
-                color: '#ff1361',
                 textAlign: 'center',
-                lineHeight: '1.4'
+                lineHeight: '1.4',
+                transform: 'scale(0.94)',
+                animation: 'scaleUp 3s forwards cubic-bezier(0.5, 1, 0.89, 1)'
               }}
             >
-              <span 
-                onClick={handleTurnClick}
-                style={{
-                  display: 'inline-block',
-                  marginRight: '0.25rem',
-                  color: animationColor,
-                  backgroundColor: animationColor === '#ff1361' ? 'lightpink' : 'lightblue',
-                  transition: 'all 0.5s ease',
-                  cursor: 'pointer',
-                  border: '2px solid red',
-                  padding: '2px 4px',
-                  fontWeight: 'bold'
-                }}
-              >Turn</span>
-              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>your</span>
-              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>words</span>
-              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>into</span>
-              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>events.</span>
+              {['Turn', 'your', 'words', 'into', 'events.'].map((word, index) => (
+                <span
+                  key={index}
+                  style={{
+                    display: 'inline-block',
+                    marginRight: '0.25rem',
+                    opacity: visibleSpans.has(index) ? 1 : 0,
+                    filter: visibleSpans.has(index) ? 'blur(0)' : 'blur(4px)',
+                    transition: 'all 0.8s cubic-bezier(0.11, 0, 0.5, 0)',
+                    color: '#ff1361'
+                  }}
+                >
+                  {word}
+                </span>
+              ))}
               <br />
-              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>Your</span>
-              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>calendar</span>
-              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>just</span>
-              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>got</span>
-              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>smarter.</span>
+              {['Your', 'calendar', 'just', 'got', 'smarter.'].map((word, index) => (
+                <span
+                  key={index + 5}
+                  style={{
+                    display: 'inline-block',
+                    marginRight: '0.25rem',
+                    opacity: visibleSpans.has(index + 5) ? 1 : 0,
+                    filter: visibleSpans.has(index + 5) ? 'blur(0)' : 'blur(4px)',
+                    transition: 'all 0.8s cubic-bezier(0.11, 0, 0.5, 0)',
+                    color: '#ff1361'
+                  }}
+                >
+                  {word}
+                </span>
+              ))}
             </h2>
           </div>
           <h2 className="text-xl font-medium text-[color:var(--md-sys-color-on-surface-variant)]">

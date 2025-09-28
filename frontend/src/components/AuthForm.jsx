@@ -1,7 +1,19 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
-const AuthForm = () => {
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+
+function AuthForm() {
+  const [animationColor, setAnimationColor] = useState('#ff1361');
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setAnimationColor(prev => prev === '#ff1361' ? '#3b82f6' : '#ff1361');
+    }, 1000); // Change color every 1 second
+    
+    return () => clearInterval(interval);
+  }, []);
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
@@ -111,18 +123,32 @@ const AuthForm = () => {
             </h1>
           </div>
           <div className="mb-6 text-center tagline-container">
-            <h2 className="text-2xl font-medium tagline-animated">
-              <span>Turn</span>
-              <span>your</span>
-              <span>words</span>
-              <span>into</span>
-              <span>events.</span>
+            <h2 
+              className="text-2xl font-medium tagline-animated test-animation"
+              style={{
+                color: '#ff1361',
+                textAlign: 'center',
+                lineHeight: '1.4'
+              }}
+            >
+              <span 
+                style={{
+                  display: 'inline-block',
+                  marginRight: '0.25rem',
+                  color: animationColor,
+                  transition: 'color 0.5s ease'
+                }}
+              >Turn</span>
+              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>your</span>
+              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>words</span>
+              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>into</span>
+              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>events.</span>
               <br />
-              <span>Your</span>
-              <span>calendar</span>
-              <span>just</span>
-              <span>got</span>
-              <span>smarter.</span>
+              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>Your</span>
+              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>calendar</span>
+              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>just</span>
+              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>got</span>
+              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>smarter.</span>
             </h2>
           </div>
           <h2 className="text-xl font-medium text-[color:var(--md-sys-color-on-surface-variant)]">

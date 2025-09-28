@@ -54,13 +54,13 @@ const UserProfile = ({ viewMode, setViewMode, isDarkMode, toggleDarkMode }) => {
                 <label className="text-sm font-medium text-[color:var(--md-sys-color-on-surface-variant)]">
                   View Mode
                 </label>
-                <div className="mt-2 flex rounded-xl bg-[color:var(--md-sys-color-surface-container)] border border-[color:var(--md-sys-color-outline)] p-1">
+                <div className="mt-2 flex rounded-xl bg-[color:var(--md-sys-color-surface-container)] p-1">
                   <button
                     onClick={() => {
                       setViewMode('standard');
                       setIsDropdownOpen(false);
                     }}
-                    className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 shadow-level-1 hover:shadow-level-2 ${
+                    className={`flex-1 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200 shadow-level-1 hover:shadow-level-2 ${
                       viewMode === 'standard'
                         ? 'bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)]'
                         : 'bg-[color:var(--md-sys-color-surface-container-highest)] text-[color:var(--md-sys-color-on-surface)] hover:bg-[color:var(--md-sys-color-primary-container)] hover:text-[color:var(--md-sys-color-on-primary-container)]'
@@ -73,7 +73,7 @@ const UserProfile = ({ viewMode, setViewMode, isDarkMode, toggleDarkMode }) => {
                       setViewMode('list');
                       setIsDropdownOpen(false);
                     }}
-                    className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 shadow-level-1 hover:shadow-level-2 ${
+                    className={`flex-1 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200 shadow-level-1 hover:shadow-level-2 ${
                       viewMode === 'list'
                         ? 'bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)]'
                         : 'bg-[color:var(--md-sys-color-surface-container-highest)] text-[color:var(--md-sys-color-on-surface)] hover:bg-[color:var(--md-sys-color-primary-container)] hover:text-[color:var(--md-sys-color-on-primary-container)]'

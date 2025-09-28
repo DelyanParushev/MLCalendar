@@ -111,19 +111,42 @@ const AuthForm = () => {
             </h1>
           </div>
           <div className="mb-6 text-center tagline-container">
-            <h2 className="text-2xl font-medium tagline-animated">
-              <span>Turn</span>
-              <span>your</span>
-              <span>words</span>
-              <span>into</span>
-              <span>events.</span>
+            <h2 
+              className="text-2xl font-medium tagline-animated"
+              style={{
+                color: '#ff1361',
+                animation: 'testScale 3s infinite',
+                transform: 'scale(0.94)'
+              }}
+            >
+              <span style={{
+                display: 'inline-block',
+                marginRight: '0.25rem',
+                animation: 'testBlink 2s infinite'
+              }}>Turn</span>
+              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>your</span>
+              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>words</span>
+              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>into</span>
+              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>events.</span>
               <br />
-              <span>Your</span>
-              <span>calendar</span>
-              <span>just</span>
-              <span>got</span>
-              <span>smarter.</span>
+              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>Your</span>
+              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>calendar</span>
+              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>just</span>
+              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>got</span>
+              <span style={{display: 'inline-block', marginRight: '0.25rem'}}>smarter.</span>
             </h2>
+            <style jsx>{`
+              @keyframes testBlink {
+                0% { color: #ff1361; }
+                50% { color: #3b82f6; }
+                100% { color: #ff1361; }
+              }
+              @keyframes testScale {
+                0% { transform: scale(0.94); }
+                50% { transform: scale(1.1); }
+                100% { transform: scale(0.94); }
+              }
+            `}</style>
           </div>
           <h2 className="text-xl font-medium text-[color:var(--md-sys-color-on-surface-variant)]">
             {isLogin ? 'Sign in to your account' : 'Create your account'}

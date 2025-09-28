@@ -111,14 +111,13 @@ const AuthForm = () => {
             </h1>
           </div>
           <div className="mb-6 text-center tagline-container">
-            <h2 className="text-2xl font-medium tagline-animated line-1">
+            <h2 className="text-2xl font-medium tagline-animated">
               <span>Turn</span>
               <span>your</span>
               <span>words</span>
               <span>into</span>
               <span>events.</span>
-            </h2>
-            <h2 className="text-2xl font-medium tagline-animated line-2">
+              <br />
               <span>Your</span>
               <span>calendar</span>
               <span>just</span>

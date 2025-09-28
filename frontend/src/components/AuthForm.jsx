@@ -3,14 +3,30 @@ import { useAuth } from '../contexts/AuthContext';
 
 function AuthForm() {
   const [animationColor, setAnimationColor] = useState('#ff1361');
+  const [testMessage, setTestMessage] = useState('Click Turn to test');
   
   useEffect(() => {
+    console.log('AuthForm mounted, starting interval');
     const interval = setInterval(() => {
-      setAnimationColor(prev => prev === '#ff1361' ? '#3b82f6' : '#ff1361');
+      console.log('Changing color...');
+      setAnimationColor(prev => {
+        const newColor = prev === '#ff1361' ? '#3b82f6' : '#ff1361';
+        console.log('Color changed to:', newColor);
+        return newColor;
+      });
     }, 1000); // Change color every 1 second
     
-    return () => clearInterval(interval);
+    return () => {
+      console.log('Cleaning up interval');
+      clearInterval(interval);
+    };
   }, []);
+
+  const handleTurnClick = () => {
+    console.log('Turn clicked!');
+    setAnimationColor(prev => prev === '#ff1361' ? '#3b82f6' : '#ff1361');
+    setTestMessage('Clicked! Color should change');
+  };
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: '',
@@ -120,6 +136,7 @@ function AuthForm() {
             </h1>
           </div>
           <div className="mb-6 text-center tagline-container">
+            <p style={{fontSize: '12px', color: '#666'}}>{testMessage}</p>
             <h2 
               className="text-2xl font-medium tagline-animated test-animation"
               style={{
@@ -129,11 +146,14 @@ function AuthForm() {
               }}
             >
               <span 
+                onClick={handleTurnClick}
                 style={{
                   display: 'inline-block',
                   marginRight: '0.25rem',
                   color: animationColor,
-                  transition: 'color 0.5s ease'
+                  transition: 'color 0.5s ease',
+                  cursor: 'pointer',
+                  border: '1px solid red'
                 }}
               >Turn</span>
               <span style={{display: 'inline-block', marginRight: '0.25rem'}}>your</span>

@@ -1,1 +1,14 @@
-PYTHONPATH=.
+# Ignore heavy files and folders
+ml/
+*.db
+.venv/
+__pycache__/
+*.pyc
+.env
+.git/
+node_modules/
+frontend/
+
+# Use vercel-specific requirements
+requirements.txt
+!requirements-vercel.txt

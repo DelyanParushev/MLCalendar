@@ -216,33 +216,15 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
                 <label className="text-sm font-medium text-[color:var(--md-sys-color-on-surface-variant)] block mb-2">
                   Дата
                 </label>
-                <input
-                  type="date"
-                  value={editedEvent.date}
-                  onChange={(e) => setEditedEvent({ ...editedEvent, date: e.target.value })}
-                  className="w-full rounded-xl p-3 
-                    bg-[color:var(--md-sys-color-surface)] 
-                    border-2 border-[color:var(--md-sys-color-outline)]
-                    text-[color:var(--md-sys-color-on-surface)]
-                    shadow-level-1 transition-all duration-200 
-                    hover:shadow-level-2 focus:shadow-level-2 
-                    focus:border-[color:var(--md-sys-color-primary)] outline-none
-                    cursor-pointer font-medium"
-                  style={{ minHeight: '52px', fontSize: '16px' }}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-sm font-medium text-[color:var(--md-sys-color-on-surface-variant)] block mb-2">
-                    Начален час
-                  </label>
+                <div className="relative">
+                  <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--md-sys-color-primary)] pointer-events-none" style={{ fontSize: '20px' }}>
+                    calendar_today
+                  </span>
                   <input
-                    type="time"
-                    value={editedEvent.startTime}
-                    onChange={(e) => setEditedEvent({ ...editedEvent, startTime: e.target.value })}
-                    step="900"
-                    className="w-full rounded-xl p-3 
+                    type="date"
+                    value={editedEvent.date}
+                    onChange={(e) => setEditedEvent({ ...editedEvent, date: e.target.value })}
+                    className="w-full rounded-xl p-3 pl-11
                       bg-[color:var(--md-sys-color-surface)] 
                       border-2 border-[color:var(--md-sys-color-outline)]
                       text-[color:var(--md-sys-color-on-surface)]
@@ -253,26 +235,59 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
                     style={{ minHeight: '52px', fontSize: '16px' }}
                   />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-sm font-medium text-[color:var(--md-sys-color-on-surface-variant)] block mb-2">
+                    Начален час
+                  </label>
+                  <div className="relative">
+                    <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--md-sys-color-primary)] pointer-events-none" style={{ fontSize: '20px' }}>
+                      schedule
+                    </span>
+                    <input
+                      type="time"
+                      value={editedEvent.startTime}
+                      onChange={(e) => setEditedEvent({ ...editedEvent, startTime: e.target.value })}
+                      step="900"
+                      className="w-full rounded-xl p-3 pl-11
+                        bg-[color:var(--md-sys-color-surface)] 
+                        border-2 border-[color:var(--md-sys-color-outline)]
+                        text-[color:var(--md-sys-color-on-surface)]
+                        shadow-level-1 transition-all duration-200 
+                        hover:shadow-level-2 focus:shadow-level-2 
+                        focus:border-[color:var(--md-sys-color-primary)] outline-none
+                        cursor-pointer font-medium"
+                      style={{ minHeight: '52px', fontSize: '16px' }}
+                    />
+                  </div>
+                </div>
 
                 <div>
                   <label className="text-sm font-medium text-[color:var(--md-sys-color-on-surface-variant)] block mb-2">
                     Краен час
                   </label>
-                  <input
-                    type="time"
-                    value={editedEvent.endTime}
-                    onChange={(e) => setEditedEvent({ ...editedEvent, endTime: e.target.value })}
-                    step="900"
-                    className="w-full rounded-xl p-3 
-                      bg-[color:var(--md-sys-color-surface)] 
-                      border-2 border-[color:var(--md-sys-color-outline)]
-                      text-[color:var(--md-sys-color-on-surface)]
-                      shadow-level-1 transition-all duration-200 
-                      hover:shadow-level-2 focus:shadow-level-2 
-                      focus:border-[color:var(--md-sys-color-primary)] outline-none
-                      cursor-pointer font-medium"
-                    style={{ minHeight: '52px', fontSize: '16px' }}
-                  />
+                  <div className="relative">
+                    <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--md-sys-color-primary)] pointer-events-none" style={{ fontSize: '20px' }}>
+                      schedule
+                    </span>
+                    <input
+                      type="time"
+                      value={editedEvent.endTime}
+                      onChange={(e) => setEditedEvent({ ...editedEvent, endTime: e.target.value })}
+                      step="900"
+                      className="w-full rounded-xl p-3 pl-11
+                        bg-[color:var(--md-sys-color-surface)] 
+                        border-2 border-[color:var(--md-sys-color-outline)]
+                        text-[color:var(--md-sys-color-on-surface)]
+                        shadow-level-1 transition-all duration-200 
+                        hover:shadow-level-2 focus:shadow-level-2 
+                        focus:border-[color:var(--md-sys-color-primary)] outline-none
+                        cursor-pointer font-medium"
+                      style={{ minHeight: '52px', fontSize: '16px' }}
+                    />
+                  </div>
                 </div>
               </div>
 

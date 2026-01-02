@@ -38,14 +38,20 @@ app.add_middleware(
 async def startup_event():
     try:
         print("🚀 Starting application...")
-        print(f"🌐 Environment: {os.getenv('RAILWAY_ENVIRONMENT_NAME', 'local')}")
+        print(f"🌐 Environment: {os.getenv('VERCEL_ENV', 'local')}")
         print(f"🌐 CORS Origins: {cors_origins_list}")
         
-        # Create all tables
+        # Skip database creation for Vercel serverless unless DATABASE_URL is set
+        database_url = os.getenv("DATABASE_URL", "")
+        if not database_url or database_url == "sqlite:///./events.db":
+            print("⚠️ No persistent database configured - using in-memory only")
+            print("⚠️ Add DATABASE_URL environment variable for persistence")
+            # Don't try to create tables on SQLite in serverless
+            return
+        
+        # Create all tables for PostgreSQL/Neon
         Base.metadata.create_all(bind=engine)
         
-        # For PostgreSQL, run initial setup
-        database_url = os.getenv("DATABASE_URL", "")
         if database_url.startswith("postgresql://") or database_url.startswith("postgres://"):
             print("🐘 PostgreSQL detected - running initial setup...")
             

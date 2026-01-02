@@ -217,7 +217,7 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
                   Дата
                 </label>
                 <div className="relative">
-                  <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--md-sys-color-primary)] pointer-events-none" style={{ fontSize: '20px' }}>
+                  <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--md-sys-color-on-surface)] pointer-events-none" style={{ fontSize: '20px' }}>
                     calendar_today
                   </span>
                   <input
@@ -243,7 +243,7 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
                     Начален час
                   </label>
                   <div className="relative">
-                    <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--md-sys-color-primary)] pointer-events-none" style={{ fontSize: '20px' }}>
+                    <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--md-sys-color-on-surface)] pointer-events-none" style={{ fontSize: '20px' }}>
                       schedule
                     </span>
                     <input
@@ -269,7 +269,7 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
                     Краен час
                   </label>
                   <div className="relative">
-                    <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--md-sys-color-primary)] pointer-events-none" style={{ fontSize: '20px' }}>
+                    <span className="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-[color:var(--md-sys-color-on-surface)] pointer-events-none" style={{ fontSize: '20px' }}>
                       schedule
                     </span>
                     <input

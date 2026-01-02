@@ -16,7 +16,6 @@ psycopg2-binary>=2.9.0
 google-auth>=2.0.0
 google-auth-oauthlib>=1.0.0
 google-auth-httplib2>=0.2.0
-mangum>=0.17.0
 
 # Note: torch and transformers are NOT included for Vercel deployment
 # ML inference is handled by HuggingFace Space API

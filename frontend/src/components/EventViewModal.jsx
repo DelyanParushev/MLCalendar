@@ -10,6 +10,23 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
     endTime: ''
   });
 
+  // Add styles to hide native browser date/time picker icons
+  useEffect(() => {
+    const styleId = 'hide-native-picker-icons';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = `
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator {
+          display: none;
+          -webkit-appearance: none;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
+
   useEffect(() => {
     if (event) {
       // Parse as local time without timezone conversion

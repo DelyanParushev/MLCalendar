@@ -391,6 +391,46 @@ def list_events(
         models.Event.owner_id == current_user.id
     ).order_by(models.Event.start.asc()).all()
 
+@app.put("/events/{event_id}", response_model=schemas.EventOut)
+def update_event(
+    event_id: int,
+    payload: dict,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(auth.get_current_active_user)
+):
+    event = db.query(models.Event).filter(
+        models.Event.id == event_id,
+        models.Event.owner_id == current_user.id
+    ).first()
+    if event is None:
+        raise HTTPException(status_code=404, detail="Събитието не е намерено")
+    
+    # Update event fields
+    if "title" in payload:
+        event.title = payload["title"]
+    
+    if "start" in payload:
+        start_str = payload["start"]
+        if start_str.endswith('Z'):
+            event.start = datetime.fromisoformat(start_str.replace('Z', '+00:00'))
+        elif '+' in start_str or start_str.endswith(('00:00', '+0000')):
+            event.start = datetime.fromisoformat(start_str)
+        else:
+            event.start = datetime.fromisoformat(start_str)
+    
+    if "end" in payload:
+        end_str = payload["end"]
+        if end_str.endswith('Z'):
+            event.end = datetime.fromisoformat(end_str.replace('Z', '+00:00'))
+        elif '+' in end_str or end_str.endswith(('00:00', '+0000')):
+            event.end = datetime.fromisoformat(end_str)
+        else:
+            event.end = datetime.fromisoformat(end_str)
+    
+    db.commit()
+    db.refresh(event)
+    return event
+
 @app.delete("/events/{event_id}", response_model=schemas.EventOut)
 def delete_event(
     event_id: int, 

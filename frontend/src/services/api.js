@@ -24,4 +24,9 @@ export async function deleteEvent(eventId) {
   return data
 }
 
+export async function updateEvent(eventId, payload) {
+  const { data } = await api.put(`/events/${eventId}`, payload)
+  return data
+}
+
 export default api

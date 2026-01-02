@@ -6,11 +6,12 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { DateTime } from "luxon";
 import AddEventForm from "./components/AddEventForm";
 import AddEventModal from "./components/AddEventModal";
+import EventViewModal from "./components/EventViewModal";
 import ListView from "./components/ListView";
 import AuthForm from "./components/AuthForm";
 import UserProfile from "./components/UserProfile";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import { listEvents, deleteEvent } from "./services/api";
+import { listEvents, deleteEvent, updateEvent } from "./services/api";
 import "@material-design-icons/font";
 import "./fonts.css";
 import "./calendar.css";
@@ -28,6 +29,8 @@ function CalendarApp() {
   });
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showAddEventModal, setShowAddEventModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [showEventViewModal, setShowEventViewModal] = useState(false);
   const { isAuthenticated, loading } = useAuth();
 
   // Handle responsive view mode on window resize
@@ -209,6 +212,21 @@ function CalendarApp() {
     } catch (error) {
       console.error('Error deleting event:', error);
       alert('Failed to delete event');
+    }
+  };
+
+  const handleEventClick = (event) => {
+    setSelectedEvent(event);
+    setShowEventViewModal(true);
+  };
+
+  const handleUpdateEvent = async (eventId, updatedData) => {
+    try {
+      await updateEvent(eventId, updatedData);
+      await fetchEvents();
+    } catch (error) {
+      console.error('Error updating event:', error);
+      alert('Failed to update event');
     }
   };
 
@@ -403,6 +421,7 @@ function CalendarApp() {
               onDateSelect={setSelectedDate}
               selectedDate={selectedDate}
               onAddEventClick={() => setShowAddEventModal(true)}
+              onEventClick={handleEventClick}
             />
           )}
         </div>
@@ -412,6 +431,19 @@ function CalendarApp() {
           isOpen={showAddEventModal}
           onClose={() => setShowAddEventModal(false)}
           onSaved={fetchEvents}
+          isDarkMode={isDarkMode}
+        />
+
+        {/* Event View Modal */}
+        <EventViewModal
+          isOpen={showEventViewModal}
+          onClose={() => {
+            setShowEventViewModal(false);
+            setSelectedEvent(null);
+          }}
+          event={selectedEvent}
+          onUpdate={handleUpdateEvent}
+          onDelete={handleDeleteEvent}
           isDarkMode={isDarkMode}
         />
       </div>

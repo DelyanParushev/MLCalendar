@@ -4,7 +4,7 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 
-const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEventClick }) => {
+const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEventClick, onEventClick }) => {
   // Get events for the selected date
   const selectedDateStr = DateTime.fromJSDate(selectedDate).toFormat('yyyy-MM-dd');
   const eventsForSelectedDate = events.filter(event => {
@@ -150,8 +150,9 @@ const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEven
               {eventsForSelectedDate.map((event) => (
                 <div
                   key={event.id}
-                  className="hover:bg-[color:var(--md-sys-color-surface-container-high)] transition-colors duration-200 group"
+                  className="hover:bg-[color:var(--md-sys-color-surface-container-high)] transition-colors duration-200 group cursor-pointer"
                   style={{ padding: '12px 16px', width: '380px', minWidth: '380px', maxWidth: '380px', boxSizing: 'border-box' }}
+                  onClick={() => onEventClick?.(event)}
                 >
                   <div style={{ position: 'relative', width: '100%', minHeight: '40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ position: 'absolute', left: '0px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', width: 'calc(100% - 100px)' }}>
@@ -188,25 +189,6 @@ const ListView = ({ events, onEventDelete, onDateSelect, selectedDate, onAddEven
                           </div>
                         )}
                       </div>
-                      <button
-                        onClick={() => {
-                          if (window.confirm('Сигурни ли сте, че искате да изтриете това събитие?')) {
-                            onEventDelete(event.id);
-                          }
-                        }}
-                        className="material-icons rounded-full opacity-0 group-hover:opacity-100 cursor-pointer bg-[color:var(--md-sys-color-surface-container)] hover:bg-[color:var(--md-sys-color-error-container)] text-[color:var(--md-sys-color-on-surface-variant)] hover:text-[color:var(--md-sys-color-on-error-container)] transition-all duration-200 border border-[color:var(--md-sys-color-outline)]"
-                        style={{ 
-                          width: '28px', 
-                          height: '28px', 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          justifyContent: 'center', 
-                          fontSize: '16px',
-                          flexShrink: '0'
-                        }}
-                      >
-                        delete
-                      </button>
                     </div>
                   </div>
                 </div>

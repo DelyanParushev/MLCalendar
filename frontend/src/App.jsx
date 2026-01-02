@@ -369,6 +369,13 @@ function CalendarApp() {
                         originalEvent: e
                       }
                     }))}
+                    eventClick={(info) => {
+                      // Find the original event from our events array
+                      const originalEvent = events.find(e => e.id === parseInt(info.event.id));
+                      if (originalEvent) {
+                        handleEventClick(originalEvent);
+                      }
+                    }}
                     eventContent={(arg) => {
                       const startTime = arg.event.start ? DateTime.fromJSDate(arg.event.start).toFormat('HH:mm') : '';
                       return (

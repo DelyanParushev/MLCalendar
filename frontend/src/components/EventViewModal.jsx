@@ -55,23 +55,26 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
 
   const handleSave = async () => {
     try {
-      // Combine date and time into ISO format
+      // Combine date and time into ISO format (keep as local time, no timezone conversion)
       const startDateTime = DateTime.fromFormat(
         `${editedEvent.date} ${editedEvent.startTime}`,
-        'yyyy-MM-dd HH:mm'
+        'yyyy-MM-dd HH:mm',
+        { zone: 'local' }
       );
       
       const endDateTime = editedEvent.endTime
         ? DateTime.fromFormat(
             `${editedEvent.date} ${editedEvent.endTime}`,
-            'yyyy-MM-dd HH:mm'
+            'yyyy-MM-dd HH:mm',
+            { zone: 'local' }
           )
         : startDateTime.plus({ hours: 1 });
 
+      // Convert to ISO string without timezone offset (treat as local time)
       const updatedEvent = {
         title: editedEvent.title,
-        start: startDateTime.toISO(),
-        end: endDateTime.toISO()
+        start: startDateTime.toFormat("yyyy-MM-dd'T'HH:mm:ss"),
+        end: endDateTime.toFormat("yyyy-MM-dd'T'HH:mm:ss")
       };
 
       await onUpdate(event.id, updatedEvent);

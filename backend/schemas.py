@@ -14,6 +14,7 @@ class UserOut(UserBase):
     id: int
     is_active: bool
     created_at: datetime
+    profile_picture: Optional[str] = None
 
     model_config = {"from_attributes": True}
 

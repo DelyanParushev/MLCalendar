@@ -11,6 +11,7 @@ class User(Base):
     hashed_password = Column(String(255), nullable=False)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), nullable=False)
+    profile_picture = Column(String(500), nullable=True)  # URL to profile picture
     
     # Relationship to events
     events = relationship("Event", back_populates="owner")

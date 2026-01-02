@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../contexts/AuthContext';
 
 function AuthForm() {
@@ -30,7 +31,25 @@ function AuthForm() {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const { login, register } = useAuth();
+  const { login, register, googleLogin } = useAuth();
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setLoading(true);
+    try {
+      const result = await googleLogin(credentialResponse.credential);
+      if (!result.success) {
+        setErrors({ general: result.error });
+      }
+    } catch (error) {
+      setErrors({ general: 'Google login failed' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    setErrors({ general: 'Google login was cancelled or failed' });
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -285,6 +304,29 @@ function AuthForm() {
                 isLogin ? 'Sign in' : 'Create account'
               )}
             </button>
+
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-[color:var(--md-sys-color-outline-variant)]"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-[color:var(--md-sys-color-surface-container)] text-[color:var(--md-sys-color-on-surface-variant)]">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            <div className="w-full flex justify-center">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                useOneTap
+                theme="outline"
+                size="large"
+                text="continue_with"
+                width="100%"
+              />
+            </div>
           </div>
 
           <div className="text-center">

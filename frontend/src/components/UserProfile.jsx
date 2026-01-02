@@ -13,9 +13,17 @@ const UserProfile = ({ viewMode, setViewMode, isDarkMode, toggleDarkMode }) => {
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         className="flex items-center gap-2 px-3 py-2 rounded-full bg-[color:var(--md-sys-color-surface-container-highest)] text-[color:var(--md-sys-color-on-surface-variant)] hover:bg-[color:var(--md-sys-color-surface-container-high)] transition-all duration-200 focus:ring-2 focus:ring-[color:var(--md-sys-color-primary)] focus:ring-opacity-20 outline-none"
       >
-        <div className="w-8 h-8 rounded-full bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)] flex items-center justify-center font-medium text-sm">
-          {user.username.charAt(0).toUpperCase()}
-        </div>
+        {user.profile_picture ? (
+          <img 
+            src={user.profile_picture} 
+            alt={user.username}
+            className="w-8 h-8 rounded-full object-cover"
+          />
+        ) : (
+          <div className="w-8 h-8 rounded-full bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)] flex items-center justify-center font-medium text-sm">
+            {user.username.charAt(0).toUpperCase()}
+          </div>
+        )}
         <span className="hidden sm:block text-sm font-medium">{user.username}</span>
         <span className="material-icons text-lg">
           {isDropdownOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
@@ -34,9 +42,17 @@ const UserProfile = ({ viewMode, setViewMode, isDarkMode, toggleDarkMode }) => {
           <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-[color:var(--md-sys-color-surface-container)] shadow-level-3 border border-[color:var(--md-sys-color-outline)] z-20 overflow-hidden">
             <div className="p-4 border-b border-[color:var(--md-sys-color-outline)]">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)] flex items-center justify-center font-medium text-lg">
-                  {user.username.charAt(0).toUpperCase()}
-                </div>
+                {user.profile_picture ? (
+                  <img 
+                    src={user.profile_picture} 
+                    alt={user.username}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)] flex items-center justify-center font-medium text-lg">
+                    {user.username.charAt(0).toUpperCase()}
+                  </div>
+                )}
                 <div>
                   <div className="font-medium text-[color:var(--md-sys-color-on-surface)]">
                     {user.username}

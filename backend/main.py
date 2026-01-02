@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from .database import Base, engine, SessionLocal
-from . import models, schemas, auth
+from . import models, schemas, auth, google_oauth
 from ml.nlp_parser_ml import parse_text
 import os
 from dotenv import load_dotenv
@@ -145,6 +145,44 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
     access_token = auth.create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires  # Use email as subject
     )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.post("/auth/google", response_model=schemas.Token)
+def google_login(payload: dict, db: Session = Depends(get_db)):
+    """
+    Authenticate user with Google ID token
+    Expects: { "token": "google_id_token" }
+    """
+    google_token = payload.get("token")
+    if not google_token:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Google token not provided"
+        )
+    
+    # Verify the Google token
+    google_user_info = google_oauth.verify_google_token(google_token)
+    if not google_user_info:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Google token"
+        )
+    
+    if not google_user_info.get('email_verified'):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Google email not verified"
+        )
+    
+    # Get or create user
+    user = google_oauth.get_or_create_google_user(db, google_user_info)
+    
+    # Create access token
+    access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = auth.create_access_token(
+        data={"sub": user.email}, expires_delta=access_token_expires
+    )
+    
     return {"access_token": access_token, "token_type": "bearer"}
 
 @app.get("/me", response_model=schemas.UserOut)

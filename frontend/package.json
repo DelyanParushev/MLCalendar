@@ -16,6 +16,7 @@
     "@fullcalendar/react": "^6.1.19",
     "@fullcalendar/timegrid": "^6.1.19",
     "@material-design-icons/font": "^0.14.15",
+    "@react-oauth/google": "^0.13.4",
     "@tailwindcss/forms": "^0.5.10",
     "axios": "^1.11.0",
     "luxon": "^3.7.1",

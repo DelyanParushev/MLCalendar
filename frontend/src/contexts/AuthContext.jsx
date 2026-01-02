@@ -68,12 +68,32 @@ export const AuthProvider = ({ children }) => {
     try {
       await api.post('/register', { email, username, password });
       // Auto-login after successful registration
-      return await login(username, password);
+      return await login(email, password);
     } catch (error) {
       console.error('Registration failed:', error);
       return { 
         success: false, 
         error: error.response?.data?.detail || 'Registration failed' 
+      };
+    }
+  };
+
+  const googleLogin = async (googleToken) => {
+    try {
+      const { data } = await api.post('/auth/google', { token: googleToken });
+      const { access_token } = data;
+      
+      setToken(access_token);
+      localStorage.setItem('token', access_token);
+      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+      
+      await fetchUserInfo();
+      return { success: true };
+    } catch (error) {
+      console.error('Google login failed:', error);
+      return { 
+        success: false, 
+        error: error.response?.data?.detail || 'Google login failed' 
       };
     }
   };
@@ -91,6 +111,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     register,
+    googleLogin,
     logout,
     isAuthenticated: !!token && !!user
   };

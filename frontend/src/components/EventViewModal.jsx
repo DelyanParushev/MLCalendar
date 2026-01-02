@@ -12,8 +12,9 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
 
   useEffect(() => {
     if (event) {
-      const startDt = DateTime.fromISO(event.start, { setZone: true });
-      const endDt = event.end ? DateTime.fromISO(event.end, { setZone: true }) : null;
+      // Parse as local time without timezone conversion
+      const startDt = DateTime.fromISO(event.start, { zone: 'local' });
+      const endDt = event.end ? DateTime.fromISO(event.end, { zone: 'local' }) : null;
       
       setEditedEvent({
         title: event.title || '',
@@ -41,8 +42,8 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
     setIsEditing(false);
     // Reset to original values
     if (event) {
-      const startDt = DateTime.fromISO(event.start, { setZone: true });
-      const endDt = event.end ? DateTime.fromISO(event.end, { setZone: true }) : null;
+      const startDt = DateTime.fromISO(event.start, { zone: 'local' });
+      const endDt = event.end ? DateTime.fromISO(event.end, { zone: 'local' }) : null;
       
       setEditedEvent({
         title: event.title || '',
@@ -97,7 +98,7 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
   };
 
   const formatDateTime = (isoString) => {
-    return DateTime.fromISO(isoString, { setZone: true }).toFormat('cccc, dd LLLL yyyy, HH:mm');
+    return DateTime.fromISO(isoString, { zone: 'local' }).toFormat('cccc, dd LLLL yyyy, HH:mm');
   };
 
   return (
@@ -225,7 +226,9 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
                     text-[color:var(--md-sys-color-on-surface)]
                     shadow-level-1 transition-all duration-200 
                     hover:shadow-level-2 focus:shadow-level-2 
-                    focus:border-[color:var(--md-sys-color-primary)] outline-none"
+                    focus:border-[color:var(--md-sys-color-primary)] outline-none
+                    cursor-pointer"
+                  style={{ minHeight: '44px' }}
                 />
               </div>
 
@@ -238,13 +241,16 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
                     type="time"
                     value={editedEvent.startTime}
                     onChange={(e) => setEditedEvent({ ...editedEvent, startTime: e.target.value })}
+                    step="300"
                     className="w-full rounded-xl p-3 
                       bg-[color:var(--md-sys-color-surface)] 
                       border border-[color:var(--md-sys-color-outline)]
                       text-[color:var(--md-sys-color-on-surface)]
                       shadow-level-1 transition-all duration-200 
                       hover:shadow-level-2 focus:shadow-level-2 
-                      focus:border-[color:var(--md-sys-color-primary)] outline-none"
+                      focus:border-[color:var(--md-sys-color-primary)] outline-none
+                      cursor-pointer"
+                    style={{ minHeight: '44px' }}
                   />
                 </div>
 
@@ -256,13 +262,16 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
                     type="time"
                     value={editedEvent.endTime}
                     onChange={(e) => setEditedEvent({ ...editedEvent, endTime: e.target.value })}
+                    step="300"
                     className="w-full rounded-xl p-3 
                       bg-[color:var(--md-sys-color-surface)] 
                       border border-[color:var(--md-sys-color-outline)]
                       text-[color:var(--md-sys-color-on-surface)]
                       shadow-level-1 transition-all duration-200 
                       hover:shadow-level-2 focus:shadow-level-2 
-                      focus:border-[color:var(--md-sys-color-primary)] outline-none"
+                      focus:border-[color:var(--md-sys-color-primary)] outline-none
+                      cursor-pointer"
+                    style={{ minHeight: '44px' }}
                   />
                 </div>
               </div>

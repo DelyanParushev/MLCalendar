@@ -311,19 +311,19 @@ def create_event(
     # Check if we have pre-parsed data
     if "title" in payload and "start" in payload:
         # Use pre-parsed data from frontend
-        # Parse the datetime and ensure it's timezone-aware
+        # Parse the datetime strings as naive (no timezone)
         start_str = payload["start"]
         print(f"📅 Original start string: {start_str}")
         
+        # Always parse as naive datetime (no timezone info)
         if start_str.endswith('Z'):
-            # Handle UTC format
-            start = datetime.fromisoformat(start_str.replace('Z', '+00:00'))
-        elif '+' in start_str or start_str.endswith(('00:00', '+0000')):
-            # Already has timezone info
-            start = datetime.fromisoformat(start_str)
+            # Remove Z to keep as naive
+            start = datetime.fromisoformat(start_str.replace('Z', ''))
+        elif '+' in start_str or '-' in start_str.split('T')[-1] if 'T' in start_str else False:
+            # Has timezone offset, remove it
+            start = datetime.fromisoformat(start_str.split('+')[0].split('-')[0] if '+' in start_str else start_str.rsplit('-', 1)[0])
         else:
-            # No timezone info - assume it's the user's local time
-            # Parse as naive datetime and don't add timezone info
+            # Already naive
             start = datetime.fromisoformat(start_str)
             print(f"🕐 Parsed start time (naive): {start}")
         
@@ -333,9 +333,9 @@ def create_event(
             print(f"📅 Original end string: {end_str}")
             
             if end_str.endswith('Z'):
-                end = datetime.fromisoformat(end_str.replace('Z', '+00:00'))
-            elif '+' in end_str or end_str.endswith(('00:00', '+0000')):
-                end = datetime.fromisoformat(end_str)
+                end = datetime.fromisoformat(end_str.replace('Z', ''))
+            elif '+' in end_str or '-' in end_str.split('T')[-1] if 'T' in end_str else False:
+                end = datetime.fromisoformat(end_str.split('+')[0].split('-')[0] if '+' in end_str else end_str.rsplit('-', 1)[0])
             else:
                 end = datetime.fromisoformat(end_str)
                 print(f"🕐 Parsed end time (naive): {end}")
@@ -411,21 +411,28 @@ def update_event(
     
     if "start" in payload:
         start_str = payload["start"]
+        print(f"📅 Updating start from: {event.start} to string: {start_str}")
+        # Always parse as naive datetime
         if start_str.endswith('Z'):
-            event.start = datetime.fromisoformat(start_str.replace('Z', '+00:00'))
-        elif '+' in start_str or start_str.endswith(('00:00', '+0000')):
-            event.start = datetime.fromisoformat(start_str)
+            event.start = datetime.fromisoformat(start_str.replace('Z', ''))
+        elif '+' in start_str or '-' in start_str.split('T')[-1] if 'T' in start_str else False:
+            # Remove timezone offset
+            event.start = datetime.fromisoformat(start_str.split('+')[0].split('-')[0] if '+' in start_str else start_str.rsplit('-', 1)[0])
         else:
             event.start = datetime.fromisoformat(start_str)
+        print(f"📅 Updated start to: {event.start}")
     
     if "end" in payload:
         end_str = payload["end"]
+        print(f"📅 Updating end from: {event.end} to string: {end_str}")
+        # Always parse as naive datetime
         if end_str.endswith('Z'):
-            event.end = datetime.fromisoformat(end_str.replace('Z', '+00:00'))
-        elif '+' in end_str or end_str.endswith(('00:00', '+0000')):
-            event.end = datetime.fromisoformat(end_str)
+            event.end = datetime.fromisoformat(end_str.replace('Z', ''))
+        elif '+' in end_str or '-' in end_str.split('T')[-1] if 'T' in end_str else False:
+            event.end = datetime.fromisoformat(end_str.split('+')[0].split('-')[0] if '+' in end_str else end_str.rsplit('-', 1)[0])
         else:
             event.end = datetime.fromisoformat(end_str)
+        print(f"📅 Updated end to: {event.end}")
     
     db.commit()
     db.refresh(event)

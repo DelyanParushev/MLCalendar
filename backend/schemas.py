@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_serializer
 from datetime import datetime
 from typing import Optional
 
@@ -50,3 +50,13 @@ class EventOut(BaseModel):
     owner_id: int
 
     model_config = {"from_attributes": True}
+    
+    @field_serializer('start', 'end')
+    def serialize_datetime(self, dt: Optional[datetime], _info):
+        if dt is None:
+            return None
+        # Return datetime without timezone info (naive datetime string)
+        # If dt has timezone, convert to naive by removing tzinfo
+        if dt.tzinfo is not None:
+            dt = dt.replace(tzinfo=None)
+        return dt.isoformat()

@@ -41,15 +41,21 @@ async def startup_event():
         print(f"🌐 Environment: {os.getenv('VERCEL_ENV', 'local')}")
         print(f"🌐 CORS Origins: {cors_origins_list}")
         
-        database_url = os.getenv("DATABASE_URL", "")
-        print(f"🗄️ DATABASE_URL: {database_url[:30]}...")
+        database_url = os.getenv("DATABASE_URL", "NOT_SET")
+        postgres_url = os.getenv("POSTGRES_URL", "NOT_SET")
+        print(f"🗄️ DATABASE_URL: {database_url[:50]}...")
+        print(f"🗄️ POSTGRES_URL: {postgres_url[:50]}...")
+        
+        # Import engine to see what was actually configured
+        from .database import engine
+        print(f"🗄️ Engine URL: {str(engine.url)[:50]}...")
         
         # Skip database operations for SQLite in serverless
-        if database_url.startswith("sqlite"):
+        if str(engine.url).startswith("sqlite"):
             print("⚠️ SQLite detected in serverless - skipping table creation")
             return
         
-        if not database_url:
+        if database_url == "NOT_SET" and postgres_url == "NOT_SET":
             print("⚠️ No DATABASE_URL set - tables may not persist")
             return
         

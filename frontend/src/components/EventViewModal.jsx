@@ -292,82 +292,80 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
                       }}
                       className="w-full rounded-xl p-3 
                         bg-[color:var(--md-sys-color-surface)] 
-                        border border-[color:var(--md-sys-color-outline)]
+                        border-2 border-[color:var(--md-sys-color-outline)]
                         text-[color:var(--md-sys-color-on-surface)]
                         shadow-level-1 transition-all duration-200 
-                        hover:shadow-level-2
-                        cursor-pointer text-left flex items-center justify-between font-medium"
-                      style={{ minHeight: '48px', fontSize: '16px' }}
+                        hover:shadow-level-2 hover:border-[color:var(--md-sys-color-primary)]
+                        cursor-pointer text-center flex items-center justify-center gap-2 font-medium"
+                      style={{ minHeight: '52px', fontSize: '18px' }}
                     >
-                      <span>{editedEvent.startTime || '--:--'}</span>
                       <span className="material-icons text-[color:var(--md-sys-color-primary)]">schedule</span>
+                      <span>{editedEvent.startTime || '--:--'}</span>
                     </button>
                     {showStartTimePicker && (
-                      <div className="absolute z-50 w-full mt-2 bg-[color:var(--md-sys-color-surface-container)] rounded-2xl shadow-level-4 overflow-hidden border border-[color:var(--md-sys-color-outline)]">
-                        <div className="p-4">
-                          <div className="text-xs font-medium text-[color:var(--md-sys-color-on-surface-variant)] mb-3 text-center">
-                            Избери час
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            {/* Hours Column */}
-                            <div>
-                              <div className="text-xs font-medium text-[color:var(--md-sys-color-on-surface-variant)] mb-2 text-center">
-                                Час
-                              </div>
-                              <div className="max-h-48 overflow-y-auto rounded-xl bg-[color:var(--md-sys-color-surface)] border border-[color:var(--md-sys-color-outline)]">
-                                {hours.map((hour) => (
-                                  <button
-                                    key={hour}
-                                    type="button"
-                                    onClick={() => {
-                                      const newTime = `${hour}:${startTimeParts.minute}`;
-                                      setEditedEvent({ ...editedEvent, startTime: newTime });
-                                    }}
-                                    className={`w-full px-3 py-2.5 text-center transition-all duration-150 font-medium ${
-                                      startTimeParts.hour === hour
-                                        ? 'bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)]'
-                                        : 'hover:bg-[color:var(--md-sys-color-surface-container-high)] text-[color:var(--md-sys-color-on-surface)]'
-                                    }`}
-                                  >
-                                    {hour}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                            {/* Minutes Column */}
-                            <div>
-                              <div className="text-xs font-medium text-[color:var(--md-sys-color-on-surface-variant)] mb-2 text-center">
-                                Минути
-                              </div>
-                              <div className="rounded-xl bg-[color:var(--md-sys-color-surface)] border border-[color:var(--md-sys-color-outline)]">
-                                {minutes.map((minute) => (
-                                  <button
-                                    key={minute}
-                                    type="button"
-                                    onClick={() => {
-                                      const newTime = `${startTimeParts.hour}:${minute}`;
-                                      setEditedEvent({ ...editedEvent, startTime: newTime });
-                                    }}
-                                    className={`w-full px-3 py-2.5 text-center transition-all duration-150 font-medium ${
-                                      startTimeParts.minute === minute
-                                        ? 'bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)]'
-                                        : 'hover:bg-[color:var(--md-sys-color-surface-container-high)] text-[color:var(--md-sys-color-on-surface)]'
-                                    }`}
-                                  >
-                                    {minute}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => setShowStartTimePicker(false)}
-                            className="w-full mt-3 px-4 py-2 rounded-xl bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)] font-medium hover:bg-[color:var(--md-sys-color-primary-container)] hover:text-[color:var(--md-sys-color-on-primary-container)] transition-all"
-                          >
-                            Готово
-                          </button>
+                      <div className="absolute z-50 left-0 right-0 mt-2 bg-[color:var(--md-sys-color-surface-container)] rounded-2xl shadow-level-4 border-2 border-[color:var(--md-sys-color-outline)] p-4" style={{ minWidth: '280px' }}>
+                        <div className="text-sm font-medium text-[color:var(--md-sys-color-on-surface-variant)] mb-3 text-center">
+                          Избери час
                         </div>
+                        <div className="grid grid-cols-2 gap-3 mb-3">
+                          {/* Hours Column */}
+                          <div>
+                            <div className="text-xs font-medium text-[color:var(--md-sys-color-on-surface-variant)] mb-2 text-center">
+                              Час
+                            </div>
+                            <div className="h-40 overflow-y-auto rounded-lg bg-[color:var(--md-sys-color-surface)] border border-[color:var(--md-sys-color-outline)] scrollbar-thin">
+                              {hours.map((hour) => (
+                                <button
+                                  key={hour}
+                                  type="button"
+                                  onClick={() => {
+                                    const newTime = `${hour}:${startTimeParts.minute}`;
+                                    setEditedEvent({ ...editedEvent, startTime: newTime });
+                                  }}
+                                  className={`w-full px-4 py-3 text-center transition-all duration-150 text-base font-medium ${
+                                    startTimeParts.hour === hour
+                                      ? 'bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)]'
+                                      : 'hover:bg-[color:var(--md-sys-color-surface-container-high)] text-[color:var(--md-sys-color-on-surface)]'
+                                  }`}
+                                >
+                                  {hour}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          {/* Minutes Column */}
+                          <div>
+                            <div className="text-xs font-medium text-[color:var(--md-sys-color-on-surface-variant)] mb-2 text-center">
+                              Минути
+                            </div>
+                            <div className="space-y-1">
+                              {minutes.map((minute) => (
+                                <button
+                                  key={minute}
+                                  type="button"
+                                  onClick={() => {
+                                    const newTime = `${startTimeParts.hour}:${minute}`;
+                                    setEditedEvent({ ...editedEvent, startTime: newTime });
+                                  }}
+                                  className={`w-full px-4 py-3 rounded-lg text-center transition-all duration-150 text-base font-medium ${
+                                    startTimeParts.minute === minute
+                                      ? 'bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)]'
+                                      : 'bg-[color:var(--md-sys-color-surface)] border border-[color:var(--md-sys-color-outline)] hover:bg-[color:var(--md-sys-color-surface-container-high)] text-[color:var(--md-sys-color-on-surface)]'
+                                  }`}
+                                >
+                                  {minute}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setShowStartTimePicker(false)}
+                          className="w-full px-4 py-3 rounded-xl bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)] font-medium hover:bg-[color:var(--md-sys-color-primary-container)] hover:text-[color:var(--md-sys-color-on-primary-container)] transition-all text-base"
+                        >
+                          Готово
+                        </button>
                       </div>
                     )}
                   </div>
@@ -386,82 +384,80 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
                       }}
                       className="w-full rounded-xl p-3 
                         bg-[color:var(--md-sys-color-surface)] 
-                        border border-[color:var(--md-sys-color-outline)]
+                        border-2 border-[color:var(--md-sys-color-outline)]
                         text-[color:var(--md-sys-color-on-surface)]
                         shadow-level-1 transition-all duration-200 
-                        hover:shadow-level-2
-                        cursor-pointer text-left flex items-center justify-between font-medium"
-                      style={{ minHeight: '48px', fontSize: '16px' }}
+                        hover:shadow-level-2 hover:border-[color:var(--md-sys-color-primary)]
+                        cursor-pointer text-center flex items-center justify-center gap-2 font-medium"
+                      style={{ minHeight: '52px', fontSize: '18px' }}
                     >
-                      <span>{editedEvent.endTime || '--:--'}</span>
                       <span className="material-icons text-[color:var(--md-sys-color-primary)]">schedule</span>
+                      <span>{editedEvent.endTime || '--:--'}</span>
                     </button>
                     {showEndTimePicker && (
-                      <div className="absolute z-50 w-full mt-2 bg-[color:var(--md-sys-color-surface-container)] rounded-2xl shadow-level-4 overflow-hidden border border-[color:var(--md-sys-color-outline)]">
-                        <div className="p-4">
-                          <div className="text-xs font-medium text-[color:var(--md-sys-color-on-surface-variant)] mb-3 text-center">
-                            Избери час
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            {/* Hours Column */}
-                            <div>
-                              <div className="text-xs font-medium text-[color:var(--md-sys-color-on-surface-variant)] mb-2 text-center">
-                                Час
-                              </div>
-                              <div className="max-h-48 overflow-y-auto rounded-xl bg-[color:var(--md-sys-color-surface)] border border-[color:var(--md-sys-color-outline)]">
-                                {hours.map((hour) => (
-                                  <button
-                                    key={hour}
-                                    type="button"
-                                    onClick={() => {
-                                      const newTime = `${hour}:${endTimeParts.minute}`;
-                                      setEditedEvent({ ...editedEvent, endTime: newTime });
-                                    }}
-                                    className={`w-full px-3 py-2.5 text-center transition-all duration-150 font-medium ${
-                                      endTimeParts.hour === hour
-                                        ? 'bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)]'
-                                        : 'hover:bg-[color:var(--md-sys-color-surface-container-high)] text-[color:var(--md-sys-color-on-surface)]'
-                                    }`}
-                                  >
-                                    {hour}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                            {/* Minutes Column */}
-                            <div>
-                              <div className="text-xs font-medium text-[color:var(--md-sys-color-on-surface-variant)] mb-2 text-center">
-                                Минути
-                              </div>
-                              <div className="rounded-xl bg-[color:var(--md-sys-color-surface)] border border-[color:var(--md-sys-color-outline)]">
-                                {minutes.map((minute) => (
-                                  <button
-                                    key={minute}
-                                    type="button"
-                                    onClick={() => {
-                                      const newTime = `${endTimeParts.hour}:${minute}`;
-                                      setEditedEvent({ ...editedEvent, endTime: newTime });
-                                    }}
-                                    className={`w-full px-3 py-2.5 text-center transition-all duration-150 font-medium ${
-                                      endTimeParts.minute === minute
-                                        ? 'bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)]'
-                                        : 'hover:bg-[color:var(--md-sys-color-surface-container-high)] text-[color:var(--md-sys-color-on-surface)]'
-                                    }`}
-                                  >
-                                    {minute}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => setShowEndTimePicker(false)}
-                            className="w-full mt-3 px-4 py-2 rounded-xl bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)] font-medium hover:bg-[color:var(--md-sys-color-primary-container)] hover:text-[color:var(--md-sys-color-on-primary-container)] transition-all"
-                          >
-                            Готово
-                          </button>
+                      <div className="absolute z-50 left-0 right-0 mt-2 bg-[color:var(--md-sys-color-surface-container)] rounded-2xl shadow-level-4 border-2 border-[color:var(--md-sys-color-outline)] p-4" style={{ minWidth: '280px' }}>
+                        <div className="text-sm font-medium text-[color:var(--md-sys-color-on-surface-variant)] mb-3 text-center">
+                          Избери час
                         </div>
+                        <div className="grid grid-cols-2 gap-3 mb-3">
+                          {/* Hours Column */}
+                          <div>
+                            <div className="text-xs font-medium text-[color:var(--md-sys-color-on-surface-variant)] mb-2 text-center">
+                              Час
+                            </div>
+                            <div className="h-40 overflow-y-auto rounded-lg bg-[color:var(--md-sys-color-surface)] border border-[color:var(--md-sys-color-outline)] scrollbar-thin">
+                              {hours.map((hour) => (
+                                <button
+                                  key={hour}
+                                  type="button"
+                                  onClick={() => {
+                                    const newTime = `${hour}:${endTimeParts.minute}`;
+                                    setEditedEvent({ ...editedEvent, endTime: newTime });
+                                  }}
+                                  className={`w-full px-4 py-3 text-center transition-all duration-150 text-base font-medium ${
+                                    endTimeParts.hour === hour
+                                      ? 'bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)]'
+                                      : 'hover:bg-[color:var(--md-sys-color-surface-container-high)] text-[color:var(--md-sys-color-on-surface)]'
+                                  }`}
+                                >
+                                  {hour}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          {/* Minutes Column */}
+                          <div>
+                            <div className="text-xs font-medium text-[color:var(--md-sys-color-on-surface-variant)] mb-2 text-center">
+                              Минути
+                            </div>
+                            <div className="space-y-1">
+                              {minutes.map((minute) => (
+                                <button
+                                  key={minute}
+                                  type="button"
+                                  onClick={() => {
+                                    const newTime = `${endTimeParts.hour}:${minute}`;
+                                    setEditedEvent({ ...editedEvent, endTime: newTime });
+                                  }}
+                                  className={`w-full px-4 py-3 rounded-lg text-center transition-all duration-150 text-base font-medium ${
+                                    endTimeParts.minute === minute
+                                      ? 'bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)]'
+                                      : 'bg-[color:var(--md-sys-color-surface)] border border-[color:var(--md-sys-color-outline)] hover:bg-[color:var(--md-sys-color-surface-container-high)] text-[color:var(--md-sys-color-on-surface)]'
+                                  }`}
+                                >
+                                  {minute}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setShowEndTimePicker(false)}
+                          className="w-full px-4 py-3 rounded-xl bg-[color:var(--md-sys-color-primary)] text-[color:var(--md-sys-color-on-primary)] font-medium hover:bg-[color:var(--md-sys-color-primary-container)] hover:text-[color:var(--md-sys-color-on-primary-container)] transition-all text-base"
+                        >
+                          Готово
+                        </button>
                       </div>
                     )}
                   </div>

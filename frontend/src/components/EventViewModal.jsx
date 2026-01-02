@@ -228,7 +228,12 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
                     hover:shadow-level-2 focus:shadow-level-2 
                     focus:border-[color:var(--md-sys-color-primary)] outline-none
                     cursor-pointer"
-                  style={{ minHeight: '44px' }}
+                  style={{ 
+                    minHeight: '44px',
+                    WebkitAppearance: 'none',
+                    MozAppearance: 'none',
+                    appearance: 'none'
+                  }}
                 />
               </div>
 

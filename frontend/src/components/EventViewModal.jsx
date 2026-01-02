@@ -3,6 +3,9 @@ import { DateTime } from 'luxon';
 
 const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
+  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
   const [editedEvent, setEditedEvent] = useState({
     title: '',
     date: '',
@@ -40,6 +43,8 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
 
   const handleCancel = () => {
     setIsEditing(false);
+    setShowStartTimePicker(false);
+    setShowEndTimePicker(false);
     // Reset to original values
     if (event) {
       const startDt = DateTime.fromISO(event.start, { zone: 'local' });
@@ -56,6 +61,10 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
 
   const handleSave = async () => {
     try {
+      // Close any open dropdowns
+      setShowStartTimePicker(false);
+      setShowEndTimePicker(false);
+      
       // Combine date and time into ISO format (keep as local time, no timezone conversion)
       const startDateTime = DateTime.fromFormat(
         `${editedEvent.date} ${editedEvent.startTime}`,
@@ -99,6 +108,27 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
 
   const formatDateTime = (isoString) => {
     return DateTime.fromISO(isoString, { zone: 'local' }).toFormat('cccc, dd LLLL yyyy, HH:mm');
+  };
+
+  // Generate time options (00:00 to 23:55 in 5-minute intervals)
+  const generateTimeOptions = () => {
+    const options = [];
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 5) {
+        const h = hour.toString().padStart(2, '0');
+        const m = minute.toString().padStart(2, '0');
+        options.push(`${h}:${m}`);
+      }
+    }
+    return options;
+  };
+
+  const timeOptions = generateTimeOptions();
+
+  // Format date for display
+  const formatDateDisplay = (dateStr) => {
+    if (!dateStr) return '';
+    return DateTime.fromFormat(dateStr, 'yyyy-MM-dd').toFormat('dd LLLL yyyy');
   };
 
   return (
@@ -216,37 +246,11 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
                 <label className="text-sm font-medium text-[color:var(--md-sys-color-on-surface-variant)] block mb-2">
                   Дата
                 </label>
-                <input
-                  type="date"
-                  value={editedEvent.date}
-                  onChange={(e) => setEditedEvent({ ...editedEvent, date: e.target.value })}
-                  className="w-full rounded-xl p-3 
-                    bg-[color:var(--md-sys-color-surface)] 
-                    border border-[color:var(--md-sys-color-outline)]
-                    text-[color:var(--md-sys-color-on-surface)]
-                    shadow-level-1 transition-all duration-200 
-                    hover:shadow-level-2 focus:shadow-level-2 
-                    focus:border-[color:var(--md-sys-color-primary)] outline-none
-                    cursor-pointer"
-                  style={{ 
-                    minHeight: '44px',
-                    WebkitAppearance: 'none',
-                    MozAppearance: 'none',
-                    appearance: 'none'
-                  }}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-sm font-medium text-[color:var(--md-sys-color-on-surface-variant)] block mb-2">
-                    Начален час
-                  </label>
+                <div className="relative">
                   <input
-                    type="time"
-                    value={editedEvent.startTime}
-                    onChange={(e) => setEditedEvent({ ...editedEvent, startTime: e.target.value })}
-                    step="300"
+                    type="date"
+                    value={editedEvent.date}
+                    onChange={(e) => setEditedEvent({ ...editedEvent, date: e.target.value })}
                     className="w-full rounded-xl p-3 
                       bg-[color:var(--md-sys-color-surface)] 
                       border border-[color:var(--md-sys-color-outline)]
@@ -258,26 +262,99 @@ const EventViewModal = ({ isOpen, onClose, event, onUpdate, onDelete, isDarkMode
                     style={{ minHeight: '44px' }}
                   />
                 </div>
+              </div>
 
-                <div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="relative">
+                  <label className="text-sm font-medium text-[color:var(--md-sys-color-on-surface-variant)] block mb-2">
+                    Начален час
+                  </label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowStartTimePicker(!showStartTimePicker);
+                        setShowEndTimePicker(false);
+                      }}
+                      className="w-full rounded-xl p-3 
+                        bg-[color:var(--md-sys-color-surface)] 
+                        border border-[color:var(--md-sys-color-outline)]
+                        text-[color:var(--md-sys-color-on-surface)]
+                        shadow-level-1 transition-all duration-200 
+                        hover:shadow-level-2 focus:shadow-level-2 
+                        focus:border-[color:var(--md-sys-color-primary)] outline-none
+                        cursor-pointer text-left flex items-center justify-between"
+                      style={{ minHeight: '44px' }}
+                    >
+                      <span>{editedEvent.startTime || 'Select time'}</span>
+                      <span className="material-icons text-sm">schedule</span>
+                    </button>
+                    {showStartTimePicker && (
+                      <div className="absolute z-50 w-full mt-1 bg-[color:var(--md-sys-color-surface-container)] border border-[color:var(--md-sys-color-outline)] rounded-xl shadow-level-3 max-h-60 overflow-y-auto">
+                        {timeOptions.map((time) => (
+                          <button
+                            key={time}
+                            type="button"
+                            onClick={() => {
+                              setEditedEvent({ ...editedEvent, startTime: time });
+                              setShowStartTimePicker(false);
+                            }}
+                            className={`w-full px-3 py-2 text-left hover:bg-[color:var(--md-sys-color-surface-container-high)] transition-colors ${
+                              editedEvent.startTime === time ? 'bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]' : ''
+                            }`}
+                          >
+                            {time}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="relative">
                   <label className="text-sm font-medium text-[color:var(--md-sys-color-on-surface-variant)] block mb-2">
                     Краен час
                   </label>
-                  <input
-                    type="time"
-                    value={editedEvent.endTime}
-                    onChange={(e) => setEditedEvent({ ...editedEvent, endTime: e.target.value })}
-                    step="300"
-                    className="w-full rounded-xl p-3 
-                      bg-[color:var(--md-sys-color-surface)] 
-                      border border-[color:var(--md-sys-color-outline)]
-                      text-[color:var(--md-sys-color-on-surface)]
-                      shadow-level-1 transition-all duration-200 
-                      hover:shadow-level-2 focus:shadow-level-2 
-                      focus:border-[color:var(--md-sys-color-primary)] outline-none
-                      cursor-pointer"
-                    style={{ minHeight: '44px' }}
-                  />
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowEndTimePicker(!showEndTimePicker);
+                        setShowStartTimePicker(false);
+                      }}
+                      className="w-full rounded-xl p-3 
+                        bg-[color:var(--md-sys-color-surface)] 
+                        border border-[color:var(--md-sys-color-outline)]
+                        text-[color:var(--md-sys-color-on-surface)]
+                        shadow-level-1 transition-all duration-200 
+                        hover:shadow-level-2 focus:shadow-level-2 
+                        focus:border-[color:var(--md-sys-color-primary)] outline-none
+                        cursor-pointer text-left flex items-center justify-between"
+                      style={{ minHeight: '44px' }}
+                    >
+                      <span>{editedEvent.endTime || 'Select time'}</span>
+                      <span className="material-icons text-sm">schedule</span>
+                    </button>
+                    {showEndTimePicker && (
+                      <div className="absolute z-50 w-full mt-1 bg-[color:var(--md-sys-color-surface-container)] border border-[color:var(--md-sys-color-outline)] rounded-xl shadow-level-3 max-h-60 overflow-y-auto">
+                        {timeOptions.map((time) => (
+                          <button
+                            key={time}
+                            type="button"
+                            onClick={() => {
+                              setEditedEvent({ ...editedEvent, endTime: time });
+                              setShowEndTimePicker(false);
+                            }}
+                            className={`w-full px-3 py-2 text-left hover:bg-[color:var(--md-sys-color-surface-container-high)] transition-colors ${
+                              editedEvent.endTime === time ? 'bg-[color:var(--md-sys-color-primary-container)] text-[color:var(--md-sys-color-on-primary-container)]' : ''
+                            }`}
+                          >
+                            {time}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 

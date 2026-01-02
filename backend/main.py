@@ -41,16 +41,22 @@ async def startup_event():
         print(f"🌐 Environment: {os.getenv('VERCEL_ENV', 'local')}")
         print(f"🌐 CORS Origins: {cors_origins_list}")
         
-        # Skip database creation for Vercel serverless unless DATABASE_URL is set
         database_url = os.getenv("DATABASE_URL", "")
-        if not database_url or database_url == "sqlite:///./events.db":
-            print("⚠️ No persistent database configured - using in-memory only")
-            print("⚠️ Add DATABASE_URL environment variable for persistence")
-            # Don't try to create tables on SQLite in serverless
+        print(f"🗄️ DATABASE_URL: {database_url[:30]}...")
+        
+        # Skip database operations for SQLite in serverless
+        if database_url.startswith("sqlite"):
+            print("⚠️ SQLite detected in serverless - skipping table creation")
+            return
+        
+        if not database_url:
+            print("⚠️ No DATABASE_URL set - tables may not persist")
             return
         
         # Create all tables for PostgreSQL/Neon
+        print("📊 Creating database tables...")
         Base.metadata.create_all(bind=engine)
+        print("✅ Database tables created successfully")
         
         if database_url.startswith("postgresql://") or database_url.startswith("postgres://"):
             print("🐘 PostgreSQL detected - running initial setup...")

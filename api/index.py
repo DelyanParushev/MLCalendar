@@ -1,4 +1,4 @@
 from backend.main import app
 
-# This is required for Vercel to find the app
-handler = app
+# Vercel will automatically detect the 'app' variable
+# No handler function needed for ASGI applications like FastAPI
